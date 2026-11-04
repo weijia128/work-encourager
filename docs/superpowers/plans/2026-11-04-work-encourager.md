@@ -278,7 +278,7 @@ interface ShopItem { name: string; price: number; emoji: string }
 ITEMS: readonly ShopItem[]   // ≥25 items, ascending price, e.g. 一杯瑞幸 15, 一份外卖 30, 一张电影票 45, 一件 T 恤 99, 一副羽毛球拍 399
 interface CopyContext {
   snapshot: Snapshot; nickname: string; wishlist: readonly WishItem[]
-  quotes: readonly (Quote & { name: string })[]; now: Date
+  quotes: readonly (Quote & { name: string })[]; lunchStart: string | null; now: Date
 }
 formatDuration(seconds: number): string   // '不到 1 分钟' | '23 分钟' | '2 小时 5 分钟'
 buildCopyCandidates(ctx: CopyContext): string[]   // each already prefixed '{称呼}，'
@@ -294,7 +294,7 @@ Rules. The templates are exact, as in Global Constraints.
 - **beforeWork:** add `还有 {formatDuration} 上班，今天又是纯赚的一天`.
 - The candidate list is never empty.
 
-- [ ] **Step 1:** Write the failing tests, using the Task 2 fixture snapshot at 15:00 with todayEarned 600 and nickname `小叶`:
+- [x] **Step 1:** Write the failing tests, using the Task 2 fixture snapshot at 15:00 with todayEarned 600 and nickname `小叶`:
   - The item countdown string equals `小叶，再过 {d}，{item} 就赚回来了` for the right item and duration.
   - The countdown is skipped when the item is unreachable before off-work.
   - Lunch-soon and last-30-min lines appear at 11:45 and 17:40.
@@ -303,10 +303,10 @@ Rules. The templates are exact, as in Global Constraints.
   - `formatDuration` boundaries: 59 s, 60 s, 3660 s.
   - `pickCopy` rotates every 30 s and is deterministic.
   - Candidates are non-empty for every status.
-- [ ] **Step 2:** Run it. Expected: FAIL.
-- [ ] **Step 3:** Implement.
-- [ ] **Step 4:** Run it. Expected: PASS.
-- [ ] **Step 5:** Commit `feat: rule-based encouragement copy`.
+- [x] **Step 2:** Run it. Expected: FAIL.
+- [x] **Step 3:** Implement.
+- [x] **Step 4:** Run it. Expected: PASS.
+- [x] **Step 5:** Commit `feat: rule-based encouragement copy`.
 
 ### Task 6: Rust shell — tray/menu bar, window behaviour
 

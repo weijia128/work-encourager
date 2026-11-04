@@ -92,3 +92,43 @@ On a flaky or captive network the request can hang indefinitely, so chips would 
 `isTradingTime` cases (10:00 / 12:00 / 15:01 / Saturday) are asserted in a single test; failures will be less precise. Acceptable.
 
 ### Verdict: APPROVED (Issue 1 folded into the next Codex batch)
+
+---
+
+## Code Review Round 5 — 2026-11-04
+
+**Scope**: Task 5 — `src/domain/copywriter.ts`, `src/data/items.ts`, tests; Round 4 fix in `src/services/http.ts`
+**Build Status**: PASS (`pnpm test` 63/63, `pnpm build` clean)
+
+Round 4 timeout fixed (`connectTimeout` + `AbortSignal.timeout(10_000)`). Copy templates match Global Constraints exactly; rotation is deterministic.
+
+### Issues
+
+#### Issue 1 (High): lunch start is hard-coded to 12:00
+**File**: src/domain/copywriter.ts:62 (`lunchStartCountdown`)
+Users set their own lunch time (or none). With lunch 11:30–12:30 the `开饭` line shows at the wrong time; with `lunch: null` it still appears. `Snapshot` carries no lunch info, so `CopyContext` cannot know it — this is a gap in the plan's interface.
+**Fix**: Add `readonly lunchStart: string | null` ('HH:MM', from `Settings.lunch?.start`) to `CopyContext`; compute the countdown with `parseHHMM` / `secondsSinceMidnight` from `dates.ts`; return null when `lunchStart` is null. Add tests: custom lunch 11:30 shows the line at 11:10 and not at 11:45; `lunchStart: null` never shows it.
+
+#### Issue 2 (Medium): `ITEMS` is not in ascending price order
+**File**: src/data/items.ts:26-28
+`一台相机 3999`, `一趟长途旅行 5000`, `一台游戏主机 3999`: `ITEMS.find(price > todayEarned)` depends on ascending order, as the plan requires.
+**Fix**: Sort ascending (or derive with a sorted copy) and add a test asserting `ITEMS` is ascending.
+
+#### Issue 3 (Low): mixed-language item name
+**File**: src/data/items.ts:31 — `一台电动 scooter` → `一台电动滑板车`.
+
+#### Issue 4 (Low): unnecessary type re-export
+**File**: src/domain/copywriter.ts:last line — `export type { Instrument, ShopItem }` is unused; remove.
+
+### Verdict: NEEDS_FIX
+
+---
+
+## Code Review Round 6 — 2026-11-04
+
+**Scope**: fixes for Round 5 — `src/domain/copywriter.ts`, `src/data/items.ts`, tests, plan Task 5 interface
+**Build Status**: PASS (`pnpm test` 64/64, `pnpm build` clean)
+
+All four issues fixed: `CopyContext.lunchStart` added (plan updated), lunch countdown uses the user's lunch start via `parseHHMM`, null lunch suppresses the line, with tests; `ITEMS` ascending with a test; item renamed; stray re-export removed.
+
+### Verdict: APPROVED
