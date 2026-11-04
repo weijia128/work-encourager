@@ -86,8 +86,8 @@ Tests sit next to their source as `*.test.ts(x)`. `src/test/fakes.ts` holds the 
 
 - [ ] **Step 1:** Install Rust with `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y`, then `source ~/.cargo/env`. Verify with `rustc --version`, which should print `rustc 1.x`. Xcode Command Line Tools must exist; check with `xcode-select -p`.
 - [ ] **Step 2:** Scaffold with `pnpm create tauri-app` (React, TypeScript, pnpm) into a temp dir, then move its contents into the project root. Set the product name `上班鼓励器` and the identifier `com.weijia.workencourager`.
-- [ ] **Step 3:** Add dev deps `vitest @vitest/coverage-v8 @testing-library/react @testing-library/user-event jsdom` and dep `zod`. In `vitest.config.ts`, set the jsdom environment and coverage thresholds of 80 (lines, functions, branches, statements) for `src/domain/**` and `src/services/**`, excluding the Tauri adapters `src/services/http.ts`, `src/services/platform.ts` and `createTauriStore`. Add `"test": "vitest run"` and `"coverage": "vitest run --coverage"`.
-- [ ] **Step 4:** Write `src/domain/sanity.test.ts` asserting `1 + 1 === 2`. Run `pnpm test`. Expected: 1 passed. Delete the file afterwards.
+- [x] **Step 3:** Add dev deps `vitest @vitest/coverage-v8 @testing-library/react @testing-library/user-event jsdom` and dep `zod`. In `vitest.config.ts`, set the jsdom environment and coverage thresholds of 80 (lines, functions, branches, statements) for `src/domain/**` and `src/services/**`, excluding the Tauri adapters `src/services/http.ts`, `src/services/platform.ts` and `createTauriStore`. Add `"test": "vitest run"` and `"coverage": "vitest run --coverage"`.
+- [x] **Step 4:** Write `src/domain/sanity.test.ts` asserting `1 + 1 === 2`. Run `pnpm test`. Expected: 1 passed. Delete the file afterwards.
 - [ ] **Step 5:** Run `pnpm tauri dev`. Expected: the template window opens. Close it.
 - [ ] **Step 6:** Run `git init`, then commit `chore: scaffold tauri 2 react app with vitest`.
 
@@ -118,19 +118,19 @@ workdaysInMonth(year: number, month: number /*1-12*/, policy: RestPolicy, cal: H
 isTradingDay(date: string, cal: HolidayCalendar): boolean   // Mon–Fri and not a calendar off-day
 ```
 
-- [ ] **Step 1:** Download `https://cdn.jsdelivr.net/gh/NateScarlet/holiday-cn@master/2026.json` to `src/data/holidays/2026.json`. Its shape is `{ year, days: [{ name, date, isOffDay }] }`.
-- [ ] **Step 2:** Write the failing tests. Use synthetic calendars unless the test names the bundled file:
+- [x] **Step 1:** Download `https://cdn.jsdelivr.net/gh/NateScarlet/holiday-cn@master/2026.json` to `src/data/holidays/2026.json`. Its shape is `{ year, days: [{ name, date, isOffDay }] }`.
+- [x] **Step 2:** Write the failing tests. Use synthetic calendars unless the test names the bundled file:
   - `double: Mon–Fri work, Sat/Sun rest` (2026-11-06 is Fri, so true; 2026-11-07 is Sat, so false)
   - `single: Saturday works, Sunday rests`
-  - `bigSmall: Saturday works only in small weeks, alternating` (smallWeekMonday `2026-11-02` gives 11-07 true, 11-14 false, 11-21 true, and 10-31 true, which is two weeks before)
+  - `bigSmall: Saturday works only in small weeks, alternating` (smallWeekMonday `2026-11-02` gives 11-07 true, 11-14 false, 11-21 true, 10-31 false (one week before), and 10-24 true (two weeks before))
   - `calendar off-day overrides policy` and `calendar 补班 day overrides policy` (a synthetic Sunday with `isOffDay:false` counts as work under `single`)
   - `workdaysInMonth(2026, 11, double, EMPTY) has 21 days, first 2026-11-02, last 2026-11-30`
   - `bundled 2026.json parses and 2026-10-01 is an off-day`
   - `parseHolidayCn throws on missing days array`
   - `isTradingDay is false on a 补班 Saturday` (synthetic calendar marking a Saturday `isOffDay:false`) and `false on a statutory off-day weekday`
-- [ ] **Step 3:** Run `pnpm test src/domain`. Expected: FAIL (modules missing).
-- [ ] **Step 4:** Implement the interfaces above. For `bigSmall`, a Saturday works when the whole number of weeks between `mondayOf(date)` and `smallWeekMonday` is even, in either direction. Compute this with date keys, not `Date` arithmetic across DST.
-- [ ] **Step 5:** Run `pnpm test src/domain`. Expected: all PASS.
+- [x] **Step 3:** Run `pnpm test src/domain`. Expected: FAIL (modules missing).
+- [x] **Step 4:** Implement the interfaces above. For `bigSmall`, a Saturday works when the whole number of weeks between `mondayOf(date)` and `smallWeekMonday` is even, in either direction. Compute this with date keys, not `Date` arithmetic across DST.
+- [x] **Step 5:** Run `pnpm test src/domain`. Expected: all PASS.
 - [ ] **Step 6:** Commit `feat: add workday and holiday calendar rules`.
 
 ### Task 2: Earnings snapshot
@@ -164,7 +164,7 @@ STATUS_LABEL: Record<WorkStatus, string>   // exact labels from Global Constrain
 
 The shared fixture is salary 21000, 09:00–18:00, lunch 12:00–13:30, `double`, `EMPTY_CALENDAR`. November 2026 has 21 workdays, so the daily wage is 1000, there are 27000 effective seconds, and the hourly wage is 133.33.
 
-- [ ] **Step 1:** Write the failing tests:
+- [x] **Step 1:** Write the failing tests:
   - `working at 2026-11-04 15:00`: status `working`, todayEarned 600, workedSeconds 16200, monthEarned 2600, monthProgress ≈ 0.12381, workdayIndex 3, workdaysTotal 21, countdown `toOffWork` 10800
   - `lunch at 12:30`: status `lunch`, todayEarned 400, countdown `toLunchEnd` 3600
   - `beforeWork at 08:00`: todayEarned 0, countdown `toWork` 3600, monthEarned 2000
@@ -174,9 +174,9 @@ The shared fixture is salary 21000, 09:00–18:00, lunch 12:00–13:30, `double`
   - `month rollover: 2026-12-01 08:59 has monthEarned 0 and December's total`
   - `no lunch: lunch null gives 32400 effective seconds`
   - `todayEarned grows by perSecond per second` (compare snapshots one second apart while working)
-- [ ] **Step 2:** Run `pnpm test src/domain/earnings`. Expected: FAIL.
-- [ ] **Step 3:** Implement `computeSnapshot` as a pure function of its inputs. When a month has 0 workdays, return a zero-wage snapshot with status `restDay`, not NaN.
-- [ ] **Step 4:** Run it. Expected: PASS.
+- [x] **Step 2:** Run `pnpm test src/domain/earnings`. Expected: FAIL.
+- [x] **Step 3:** Implement `computeSnapshot` as a pure function of its inputs. When a month has 0 workdays, return a zero-wage snapshot with status `restDay`, not NaN.
+- [x] **Step 4:** Run it. Expected: PASS.
 - [ ] **Step 5:** Commit `feat: compute earnings snapshot from wall clock`.
 
 ### Task 3: Settings schema, storage, holiday loader
