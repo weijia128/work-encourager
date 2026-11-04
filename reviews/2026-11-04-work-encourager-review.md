@@ -42,3 +42,31 @@ Note: commits could not be made inside the Codex sandbox (`.git` read-only). The
 All four issues fixed as recommended: `computeSnapshot` split into `parseDayShape` / `todaySlice` / `monthTotals` (now ≤50 lines, behaviour unchanged), no reassigned `let` left in `src/domain/`, `coverage/` ignored, plan example corrected.
 
 ### Verdict: APPROVED
+
+---
+
+## Code Review Round 3 — 2026-11-04
+
+**Scope**: Task 3 — `src/domain/settings.ts`, `src/services/{kvStore,settingsRepo,holidayLoader}.ts`, `src/test/fakes.ts`, Rust store-plugin registration
+**Build Status**: PASS (`pnpm test` 48/48, `pnpm build` clean, coverage 95.5% lines overall, `cargo check` clean)
+
+Note: Codex was cut off by the relay ("Selected model is at capacity") after finishing the code but before its final report; results verified independently here.
+
+All planned interfaces present; every rejection case from the plan is covered with its Chinese message; `loadCalendar` handles bundled / cached / fetched / failed years as specified (Review Focus #2 covered).
+
+### Issues
+
+#### Issue 1 (Medium): very long single-line declarations hurt readability
+**File**: src/domain/settings.ts:17-24
+Several schema lines exceed 150 characters (wishSchema, restPolicySchema).
+**Fix**: Break into multi-line object literals; consider reusing `parseHHMM` from `dates.ts` in `superRefine` instead of the local `minutes` helper.
+
+#### Issue 2 (Low): a cache write failure discards freshly fetched holiday data
+**File**: src/services/holidayLoader.ts:18
+If `kv.set` throws after a successful fetch, the outer catch returns `[]`.
+**Fix**: Wrap only the `kv.set` in its own try/catch and still return `days`.
+
+#### Issue 3 (Low): plan checkboxes for Task 3 not marked
+**Fix**: Mark Task 3 steps 1–4 `[x]`.
+
+### Verdict: APPROVED (Medium/Low items folded into the next Codex batch)
