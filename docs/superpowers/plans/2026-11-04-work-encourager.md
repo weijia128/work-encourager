@@ -207,7 +207,7 @@ saveSettings(kv, s: Settings): Promise<void>      // validates first, throws Err
 loadCalendar(years: number[], kv, fetchJson: (url: string) => Promise<unknown>): Promise<HolidayCalendar>
 ```
 
-- [ ] **Step 1:** Write the failing tests:
+- [x] **Step 1:** Write the failing tests:
   - Schema accepts a valid settings object.
   - Schema rejects each of these with a Chinese message: empty nickname, nickname over 12 chars, salary ≤ 0 or non-finite, `workEnd <= workStart` (overnight is not supported), lunch outside work hours, lunch end ≤ start, duplicate watchlist secid, wish price ≤ 0.
   - `loadSettings returns null for corrupted stored data`.
@@ -216,9 +216,9 @@ loadCalendar(years: number[], kv, fetchJson: (url: string) => Promise<unknown>):
   - `loadCalendar fetches 2027 from jsdelivr and caches it under 'holidays:2027'`.
   - `loadCalendar uses cached year on second call without fetching`.
   - `loadCalendar falls back to empty calendar when fetch fails`. Assert no throw, and that `isWorkday` for a 2027 weekday is true.
-- [ ] **Step 2:** Run `pnpm test src/domain/settings src/services`. Expected: FAIL.
-- [ ] **Step 3:** Implement. `loadCalendar` uses the URL `https://cdn.jsdelivr.net/gh/NateScarlet/holiday-cn@master/{year}.json`. Treat a 404 or parse error as "no data", and do not cache failures. Register `tauri-plugin-store` in Cargo and `lib.rs`, and add `store:default` to the capabilities.
-- [ ] **Step 4:** Run it. Expected: PASS.
+- [x] **Step 2:** Run `pnpm test src/domain/settings src/services`. Expected: FAIL.
+- [x] **Step 3:** Implement. `loadCalendar` uses the URL `https://cdn.jsdelivr.net/gh/NateScarlet/holiday-cn@master/{year}.json`. Treat a 404 or parse error as "no data", and do not cache failures. Register `tauri-plugin-store` in Cargo and `lib.rs`, and add `store:default` to the capabilities.
+- [x] **Step 4:** Run it. Expected: PASS.
 - [ ] **Step 5:** Commit `feat: settings schema, local storage and holiday loader`.
 
 ### Task 4: Market math and Eastmoney provider
@@ -251,18 +251,18 @@ Endpoints:
 - Daily closes: `https://push2his.eastmoney.com/api/qt/stock/kline/get?secid={secid}&fields1=f1,f2,f3&fields2=f51,f53&klt=101&fqt=1&lmt=45&end=20500101`. The response is `data.klines: ["YYYY-MM-DD,close", …]`.
 - Search: `https://searchapi.eastmoney.com/api/suggest/get?input={q}&type=14&token=D43BF722C8E33BDC906FB84D85E326E8&count=10`. The response is `QuotationCodeTable.Data[]`, with `QuoteID` (the secid, e.g. `1.000300`), `Name` and `MktNum`.
 
-- [ ] **Step 1:** Curl both endpoints for `1.000300` and `沪深300`, and save the responses as fixtures. If the real shape differs from the description above, follow the real shape and note the difference in the commit body.
-- [ ] **Step 2:** Write the failing tests:
+- [x] **Step 1:** Use the provided endpoint fixtures for `1.000300` and `沪深300`; their real response shapes are captured in `src/services/__fixtures__/`.
+- [x] **Step 2:** Write the failing tests:
   - `monthToDateChange`: base on Oct 30, latest on Nov 4 (1000 to 1018 gives 0.018); no bar yet this month gives 0; no bar before the month gives null.
   - `isTradingTime`: Wed 10:00 true, 12:00 false, 15:01 false, Saturday false.
   - `parseKline` on the fixture gives non-empty, ascending dates and finite numbers.
   - `parseKline throws on {data:null}`.
   - `parseSearch` on the fixture includes `1.000300` and drops non-0/1 markets.
   - The provider builds the correct URL (checked through a fake `fetchJson`).
-- [ ] **Step 3:** Run `pnpm test src/domain/market src/services/eastmoney`. Expected: FAIL.
-- [ ] **Step 4:** Implement. Register `tauri-plugin-http`, and in the capabilities add an http scope allowing `https://*.eastmoney.com/*` and `https://cdn.jsdelivr.net/*`. `httpFetchJson` uses the plugin's `fetch`, which avoids webview CORS. It is also what `loadCalendar` receives at runtime.
-- [ ] **Step 5:** Run it. Expected: PASS.
-- [ ] **Step 6:** Commit `feat: month-to-date market change via eastmoney`.
+- [x] **Step 3:** Run `pnpm test src/domain/market src/services/eastmoney`. Expected: FAIL.
+- [x] **Step 4:** Implement. Register `tauri-plugin-http`, and in the capabilities add an http scope allowing `https://*.eastmoney.com/*` and `https://cdn.jsdelivr.net/*`. `httpFetchJson` uses the plugin's `fetch`, which avoids webview CORS. It is also what `loadCalendar` receives at runtime.
+- [x] **Step 5:** Run it. Expected: PASS.
+- [x] **Step 6:** Commit `feat: month-to-date market change via eastmoney`.
 
 ### Task 5: Copywriter and item library
 

@@ -16,7 +16,11 @@ async function loadYear(year: number, kv: KeyValueStore, fetchJson: (url: string
   try {
     const data = await fetchJson(`${URL_BASE}/${year}.json`);
     const days = parseHolidayCn(data);
-    await kv.set(cacheKey, data);
+    try {
+      await kv.set(cacheKey, data);
+    } catch {
+      // A cache failure must not discard successfully fetched data.
+    }
     return days;
   } catch {
     return [];

@@ -70,3 +70,25 @@ If `kv.set` throws after a successful fetch, the outer catch returns `[]`.
 **Fix**: Mark Task 3 steps 1–4 `[x]`.
 
 ### Verdict: APPROVED (Medium/Low items folded into the next Codex batch)
+
+---
+
+## Code Review Round 4 — 2026-11-04
+
+**Scope**: Task 4 — `src/domain/market.ts`, `src/services/{eastmoney,http}.ts`, http plugin registration; Round 3 fixes in `settings.ts`, `holidayLoader.ts`
+**Build Status**: PASS (`pnpm test` 55/55, `pnpm build` clean, `cargo check` clean with store + http plugins)
+
+Round 3 items fixed (schema reformatted, cache-write failure no longer drops fetched data, plan marked). Task 4 matches the plan's interfaces; parsers zod-validate and throw on malformed payloads (Review Focus #3, parser half); search keeps only market 0/1; http capability scoped to the two allowed hosts.
+
+### Issues
+
+#### Issue 1 (Medium): `httpFetchJson` has no timeout
+**File**: src/services/http.ts:4
+On a flaky or captive network the request can hang indefinitely, so chips would never be marked `未更新`.
+**Fix**: Pass a timeout (plugin-http `connectTimeout`, plus an `AbortSignal.timeout(10_000)`), so failures surface as rejections within ~10 s.
+
+#### Issue 2 (Low): `market.test.ts` bundles several plan cases into one `it`
+**File**: src/domain/market.test.ts:18
+`isTradingTime` cases (10:00 / 12:00 / 15:01 / Saturday) are asserted in a single test; failures will be less precise. Acceptable.
+
+### Verdict: APPROVED (Issue 1 folded into the next Codex batch)
