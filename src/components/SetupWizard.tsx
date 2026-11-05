@@ -12,9 +12,13 @@ import type { Settings } from "../domain/settings";
 export function SetupWizard({
   initial,
   onDone,
+  submitLabel = "开始上班",
+  stampMonth = true,
 }: {
   initial?: Settings;
   onDone: (settings: Settings) => void;
+  submitLabel?: string;
+  stampMonth?: boolean;
 }) {
   const { now } = useServices();
   const reference = now();
@@ -24,7 +28,14 @@ export function SetupWizard({
     setForm((old) => ({ ...old, [key]: value }));
   const submit = (event: FormEvent) => {
     event.preventDefault();
-    const result = validateSettings(formToSettings(form, now()));
+    const referenceNow = now();
+    const result = validateSettings(
+      formToSettings(
+        form,
+        referenceNow,
+        stampMonth ? undefined : (initial?.lastConfirmedMonth ?? null),
+      ),
+    );
     if (result.settings) {
       setErrors({});
       onDone(result.settings);
@@ -61,7 +72,7 @@ export function SetupWizard({
             {message}
           </div>
         ))}
-        <button type="submit">开始上班</button>
+        <button type="submit">{submitLabel}</button>
       </form>
     </main>
   );

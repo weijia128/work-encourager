@@ -32,3 +32,10 @@ export function mondayOf(key: string): string {
   d.setDate(d.getDate() + offset);
   return toDateKey(d);
 }
+
+export function formatClock(d: Date): string {
+  const time = [d.getHours(), d.getMinutes(), d.getSeconds()]
+    .map((value) => String(value).padStart(2, "0"))
+    .join(":");
+  return `${toDateKey(d)} ${"日一二三四五六"[d.getDay()]} ${time}`;
+}

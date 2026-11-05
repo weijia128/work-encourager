@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { toDateKey } from "./dates";
 
 export interface HolidayDay {
   date: string;
@@ -34,6 +35,24 @@ export function buildCalendar(days: readonly HolidayDay[]): HolidayCalendar {
     map.set(day.date, day);
   }
   return map;
+}
+
+export function nextHoliday(
+  now: Date,
+  calendar: HolidayCalendar,
+): { name: string; date: string; days: number } | null {
+  const today = toDateKey(now);
+  const next = Array.from(calendar.values())
+    .filter((day) => day.isOffDay && day.date >= today)
+    .sort((a, b) => a.date.localeCompare(b.date))[0];
+  const start = new Date(`${today}T00:00:00`);
+  const fallbackDate = `${now.getFullYear() + 1}-01-01`;
+  const target = new Date(`${next?.date ?? fallbackDate}T00:00:00`);
+  return {
+    name: next?.name ?? "元旦",
+    date: next?.date ?? fallbackDate,
+    days: Math.round((target.getTime() - start.getTime()) / 86_400_000),
+  };
 }
 
 export const EMPTY_CALENDAR: HolidayCalendar = new Map();

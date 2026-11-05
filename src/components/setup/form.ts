@@ -16,6 +16,9 @@ export type FormState = {
   autostart: boolean;
   alwaysOnTop: boolean;
   muyuSound: boolean;
+  hideTodayEarned: boolean;
+  hideProgressAmount: boolean;
+  hideWorkDuration: boolean;
 };
 
 export type UpdateForm = <K extends keyof FormState>(key: K, value: FormState[K]) => void;
@@ -44,10 +47,17 @@ export function settingsToForm(initial: Settings | undefined, reference: Date): 
     autostart: draft.autostart,
     alwaysOnTop: draft.alwaysOnTop,
     muyuSound: draft.muyuSound,
+    hideTodayEarned: draft.hideTodayEarned,
+    hideProgressAmount: draft.hideProgressAmount,
+    hideWorkDuration: draft.hideWorkDuration,
   };
 }
 
-export function formToSettings(form: FormState, now: Date): Settings {
+export function formToSettings(
+  form: FormState,
+  now: Date,
+  lastConfirmedMonth: string | null = monthKey(now),
+): Settings {
   const currentMonday = mondayOf(toDateKey(now));
   const previousMonday = new Date(`${currentMonday}T00:00:00`);
   previousMonday.setDate(previousMonday.getDate() - 7);
@@ -70,7 +80,10 @@ export function formToSettings(form: FormState, now: Date): Settings {
     autostart: form.autostart,
     alwaysOnTop: form.alwaysOnTop,
     muyuSound: form.muyuSound,
-    lastConfirmedMonth: monthKey(now),
+    hideTodayEarned: form.hideTodayEarned,
+    hideProgressAmount: form.hideProgressAmount,
+    hideWorkDuration: form.hideWorkDuration,
+    lastConfirmedMonth,
   };
 }
 

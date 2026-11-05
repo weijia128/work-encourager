@@ -56,7 +56,7 @@ export function createEastmoneyProvider(
         fields2: "f51,f53",
         klt: "101",
         fqt: "1",
-        lmt: "45",
+        lmt: "300",
         end: "20500101",
       });
       return parseKline(await fetchJson(`${KLINE_URL}?${params.toString()}`));

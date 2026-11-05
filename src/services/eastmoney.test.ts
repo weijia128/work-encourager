@@ -29,6 +29,7 @@ describe("eastmoney provider", () => {
     await provider.fetchDailyCloses("1.000300");
     await provider.search("沪深300");
     expect(urls[0]).toContain("secid=1.000300");
+    expect(urls[0]).toContain("lmt=300");
     expect(urls[1]).toContain("input=%E6%B2%AA%E6%B7%B1300");
   });
 });

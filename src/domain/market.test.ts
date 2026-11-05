@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { EMPTY_CALENDAR } from "./holidays";
-import { isTradingTime, monthToDateChange } from "./market";
+import { isTradingTime, monthToDateChange, yearToDateChange } from "./market";
 
 describe("market math", () => {
   const closes = [
@@ -10,6 +10,17 @@ describe("market math", () => {
 
   it("calculates month to date change", () => {
     expect(monthToDateChange(closes, new Date(2026, 10, 4))).toBeCloseTo(0.018);
+  });
+  it("calculates year to date change from the previous year's last close", () => {
+    expect(
+      yearToDateChange(
+        [
+          { date: "2025-12-31", close: 1000 },
+          { date: "2026-11-04", close: 1120 },
+        ],
+        new Date(2026, 10, 4),
+      ),
+    ).toBeCloseTo(0.12);
   });
   it("returns zero before a current-month bar and null without a base", () => {
     expect(monthToDateChange([{ date: "2026-10-30", close: 1000 }], new Date(2026, 10, 1))).toBe(0);

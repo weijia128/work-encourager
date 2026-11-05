@@ -2,6 +2,8 @@ import { settingsSchema, type Settings } from "../domain/settings";
 import type { KeyValueStore } from "./kvStore";
 
 const SETTINGS_KEY = "settings";
+const QUOTES_KEY = "quotes";
+const MERIT_KEY = "merit";
 
 export async function loadSettings(kv: KeyValueStore): Promise<Settings | null> {
   try {
@@ -18,4 +20,28 @@ export async function saveSettings(kv: KeyValueStore, settings: Settings): Promi
   const parsed = settingsSchema.safeParse(settings);
   if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "设置无效");
   await kv.set(SETTINGS_KEY, parsed.data);
+}
+
+export async function loadQuotes<T>(kv: KeyValueStore): Promise<T | undefined> {
+  try {
+    return await kv.get<T>(QUOTES_KEY);
+  } catch {
+    return undefined;
+  }
+}
+
+export async function saveQuotes<T>(kv: KeyValueStore, quotes: T): Promise<void> {
+  await kv.set(QUOTES_KEY, quotes);
+}
+
+export async function loadMerit<T>(kv: KeyValueStore): Promise<T | undefined> {
+  try {
+    return await kv.get<T>(MERIT_KEY);
+  } catch {
+    return undefined;
+  }
+}
+
+export async function saveMerit<T>(kv: KeyValueStore, merit: T): Promise<void> {
+  await kv.set(MERIT_KEY, merit);
 }

@@ -28,6 +28,30 @@ export function OptionsSection({ form, update }: { form: FormState; update: Upda
         />
         木鱼声音
       </label>
+      <label>
+        <input
+          type="checkbox"
+          checked={form.hideTodayEarned}
+          onChange={(event) => update("hideTodayEarned", event.target.checked)}
+        />
+        隐藏今日收入详情
+      </label>
+      <label>
+        <input
+          type="checkbox"
+          checked={form.hideProgressAmount}
+          onChange={(event) => update("hideProgressAmount", event.target.checked)}
+        />
+        隐藏进度金额
+      </label>
+      <label>
+        <input
+          type="checkbox"
+          checked={form.hideWorkDuration}
+          onChange={(event) => update("hideWorkDuration", event.target.checked)}
+        />
+        隐藏工作时长
+      </label>
     </fieldset>
   );
 }

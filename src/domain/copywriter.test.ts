@@ -1,7 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { computeSnapshot, type WorkSchedule } from "./earnings";
 import { EMPTY_CALENDAR } from "./holidays";
-import { buildCopyCandidates, formatDuration, pickCopy, type CopyContext } from "./copywriter";
+import {
+  buildCopyCandidates,
+  formatDuration,
+  isDaoCopyTime,
+  pickCopy,
+  pickCopyLines,
+  type CopyContext,
+} from "./copywriter";
 import { ITEMS } from "../data/items";
 
 const schedule: WorkSchedule = {
@@ -39,6 +46,14 @@ describe("buildCopyCandidates", () => {
   it("skips an item that cannot be reached before off-work", () => {
     const lines = buildCopyCandidates(contextAt("2026-11-04T17:40:00"));
     expect(lines.some((line) => line.includes("就赚回来了"))).toBe(false);
+  });
+
+  it("includes everyday price comparisons and non-material encouragement", () => {
+    const lines = buildCopyCandidates(contextAt("2026-11-04T15:00:00"));
+    expect(lines.some((line) => line.includes("一杯奶茶"))).toBe(true);
+    expect(lines.some((line) => line.includes("一张电影票"))).toBe(true);
+    expect(lines).toContain("小叶，工资在涨，经验值也在涨，剩余电量另算");
+    expect(lines).toContain("小叶，班味可以重，饭点必须准");
   });
 
   it("uses the configured lunch start and final thirty-minute lines", () => {
@@ -106,14 +121,37 @@ describe("ITEMS", () => {
   });
 });
 
+describe("pickCopyLines", () => {
+  it("returns one wish, one everyday-price line, and one workplace-humor line", () => {
+    const lines = pickCopyLines(
+      contextAt("2026-11-04T15:00:00", {
+        wishlist: [{ name: "新书", price: 1000 }],
+      }),
+    );
+    expect(lines).toHaveLength(3);
+    expect(lines[0]).toContain("新书");
+    expect(lines[1]).toMatch(/赚|奶茶|饭|电影/);
+    expect(lines[2]).toMatch(/上班|下班|打工人|工资|班味|工作|职场|活|电量/);
+  });
+
+  it("alternates workplace humor and Daoist text every thirty minutes", () => {
+    const first = contextAt("2026-11-04T15:00:00");
+    const later = contextAt("2026-11-04T15:30:00");
+    expect(isDaoCopyTime(later.now)).not.toBe(isDaoCopyTime(first.now));
+    const third = pickCopyLines(first)[2];
+    if (isDaoCopyTime(first.now)) expect(third).toContain("《");
+    else expect(third).not.toContain("——《");
+  });
+});
+
 describe("pickCopy", () => {
-  it("rotates deterministically every thirty seconds", () => {
+  it("rotates deterministically every hour", () => {
     const firstContext = contextAt("2026-11-04T15:00:00");
     const first = pickCopy(firstContext);
     expect(pickCopy(firstContext)).toBe(first);
-    const nextContext = contextAt("2026-11-04T15:00:30");
+    const nextContext = contextAt("2026-11-04T16:00:00");
     const nextCandidates = buildCopyCandidates(nextContext);
-    const index = Math.floor(nextContext.now.getTime() / 1000 / 30) % nextCandidates.length;
+    const index = Math.floor(nextContext.now.getTime() / 1000 / 3600) % nextCandidates.length;
     expect(pickCopy(nextContext)).toBe(nextCandidates[index]);
   });
 });

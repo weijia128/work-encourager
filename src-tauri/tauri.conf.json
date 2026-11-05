@@ -13,8 +13,10 @@
     "windows": [
       {
         "title": "上班鼓励器",
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
         "width": 380,
-        "height": 680,
+        "height": 760,
         "label": "main",
         "resizable": false,
         "alwaysOnTop": true,

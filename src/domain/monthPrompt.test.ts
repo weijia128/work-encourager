@@ -14,6 +14,9 @@ const base: Settings = {
   autostart: false,
   alwaysOnTop: true,
   muyuSound: false,
+  hideTodayEarned: false,
+  hideProgressAmount: false,
+  hideWorkDuration: false,
   lastConfirmedMonth: "2026-11",
 };
 describe("needsMonthPrompt", () => {

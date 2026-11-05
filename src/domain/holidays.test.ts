@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseHolidayCn, buildCalendar, EMPTY_CALENDAR } from "./holidays";
+import { parseHolidayCn, buildCalendar, EMPTY_CALENDAR, nextHoliday } from "./holidays";
 import bundled2026 from "../data/holidays/2026.json";
 
 describe("parseHolidayCn", () => {
@@ -25,6 +25,23 @@ describe("buildCalendar", () => {
 
   it("EMPTY_CALENDAR is empty", () => {
     expect(EMPTY_CALENDAR.size).toBe(0);
+    expect(nextHoliday(new Date(2026, 10, 5), EMPTY_CALENDAR)).toEqual({
+      name: "元旦",
+      date: "2027-01-01",
+      days: 57,
+    });
+  });
+
+  it("finds the next off-day and ignores make-up workdays", () => {
+    const cal = buildCalendar([
+      { name: "元旦", date: "2027-01-01", isOffDay: true },
+      { name: "元旦", date: "2027-01-02", isOffDay: false },
+    ]);
+    expect(nextHoliday(new Date(2026, 10, 5, 14), cal)).toEqual({
+      name: "元旦",
+      date: "2027-01-01",
+      days: 57,
+    });
   });
 });
 

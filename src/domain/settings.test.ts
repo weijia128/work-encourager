@@ -13,6 +13,9 @@ const valid: Settings = {
   autostart: false,
   alwaysOnTop: true,
   muyuSound: false,
+  hideTodayEarned: false,
+  hideProgressAmount: false,
+  hideWorkDuration: false,
   lastConfirmedMonth: null,
 };
 
@@ -20,6 +23,18 @@ describe("settingsSchema", () => {
   it("accepts a valid settings object", () => {
     expect(settingsSchema.parse(valid)).toEqual(valid);
     expect(defaultSettingsDraft().watchlist).toEqual(DEFAULT_WATCHLIST);
+  });
+
+  it("defaults privacy switches for settings saved by older versions", () => {
+    const legacy: Record<string, unknown> = { ...valid };
+    delete legacy.hideTodayEarned;
+    delete legacy.hideProgressAmount;
+    delete legacy.hideWorkDuration;
+    expect(settingsSchema.parse(legacy)).toMatchObject({
+      hideTodayEarned: false,
+      hideProgressAmount: false,
+      hideWorkDuration: false,
+    });
   });
 
   it.each([

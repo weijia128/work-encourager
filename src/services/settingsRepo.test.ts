@@ -15,6 +15,9 @@ const settings: Settings = {
   autostart: false,
   alwaysOnTop: true,
   muyuSound: false,
+  hideTodayEarned: false,
+  hideProgressAmount: false,
+  hideWorkDuration: false,
   lastConfirmedMonth: null,
 };
 

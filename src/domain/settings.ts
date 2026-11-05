@@ -18,6 +18,9 @@ export interface Settings extends WorkSchedule {
   readonly autostart: boolean;
   readonly alwaysOnTop: boolean;
   readonly muyuSound: boolean;
+  readonly hideTodayEarned: boolean;
+  readonly hideProgressAmount: boolean;
+  readonly hideWorkDuration: boolean;
   readonly lastConfirmedMonth: string | null;
 }
 
@@ -58,6 +61,9 @@ export const settingsSchema: z.ZodType<Settings> = z
     autostart: z.boolean(),
     alwaysOnTop: z.boolean(),
     muyuSound: z.boolean(),
+    hideTodayEarned: z.boolean().default(false),
+    hideProgressAmount: z.boolean().default(false),
+    hideWorkDuration: z.boolean().default(false),
     lastConfirmedMonth: z.union([z.null(), z.string().regex(/^\d{4}-\d{2}$/, "月份格式错误")]),
   })
   .superRefine((value, ctx) => {
@@ -108,6 +114,9 @@ export function defaultSettingsDraft(): Omit<Settings, "nickname" | "monthlySala
     autostart: false,
     alwaysOnTop: true,
     muyuSound: false,
+    hideTodayEarned: false,
+    hideProgressAmount: false,
+    hideWorkDuration: false,
     lastConfirmedMonth: null,
   };
 }

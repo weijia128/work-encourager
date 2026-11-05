@@ -1,8 +1,17 @@
 import { ITEMS } from "../data/items";
+import bundledCopyLibrary from "../data/copyLibrary.json";
 import type { Snapshot } from "./earnings";
 import type { WishItem } from "./settings";
 import type { Quote } from "./market";
 import { parseHHMM, secondsSinceMidnight } from "./dates";
+
+export interface CopyLibrary {
+  readonly version: number;
+  readonly humor: readonly string[];
+  readonly dao: readonly string[];
+}
+
+export const BUNDLED_COPY_LIBRARY: CopyLibrary = bundledCopyLibrary;
 
 export interface CopyContext {
   readonly snapshot: Snapshot;
@@ -11,6 +20,7 @@ export interface CopyContext {
   readonly quotes: readonly (Quote & { name: string })[];
   readonly lunchStart: string | null;
   readonly now: Date;
+  readonly copyLibrary?: CopyLibrary;
 }
 
 export function formatDuration(seconds: number): string {
@@ -44,6 +54,30 @@ function reachableSeconds(snapshot: Snapshot): number {
     : 0;
 }
 
+function dailyItemLines(ctx: CopyContext): string[] {
+  const { snapshot } = ctx;
+  if (snapshot.status !== "working" || snapshot.todayEarned <= 0) return [];
+  return ITEMS.filter((item) => item.price <= 100 && snapshot.todayEarned >= item.price).map(
+    (item) => {
+      const count = snapshot.todayEarned / item.price;
+      const formatted = count >= 10 ? count.toFixed(0) : count.toFixed(1);
+      return prefix(ctx.nickname, `今天已赚的钱 ≈ ${formatted} × ${item.name}`);
+    },
+  );
+}
+
+function encouragementLines(ctx: CopyContext): string[] {
+  const library = ctx.copyLibrary ?? BUNDLED_COPY_LIBRARY;
+  return ctx.snapshot.status === "working"
+    ? library.humor.map((line) => prefix(ctx.nickname, line))
+    : [];
+}
+
+function daoLines(ctx: CopyContext): string[] {
+  const library = ctx.copyLibrary ?? BUNDLED_COPY_LIBRARY;
+  return library.dao.map((line) => prefix(ctx.nickname, line));
+}
+
 function nearbyLines(ctx: CopyContext): string[] {
   const { snapshot } = ctx;
   if (snapshot.status !== "working" || !snapshot.countdown) return [];
@@ -66,14 +100,12 @@ function lunchStartCountdown(ctx: CopyContext): number | null {
 }
 
 function wishLines(ctx: CopyContext): string[] {
-  return ctx.wishlist
-    .map((wish) => ctx.snapshot.monthEarned / wish.price)
-    .map((count, index) =>
-      count >= 0.1
-        ? prefix(ctx.nickname, `本月已经赚出 ${count.toFixed(1)} 个 ${ctx.wishlist[index].name}`)
-        : null,
-    )
-    .filter((line): line is string => line !== null);
+  return ctx.wishlist.map((wish) => {
+    const count = ctx.snapshot.monthEarned / wish.price;
+    return count >= 0.1
+      ? prefix(ctx.nickname, `本月已经赚出 ${count.toFixed(1)} 个 ${wish.name}`)
+      : prefix(ctx.nickname, `${wish.name}心愿进度 ${(count * 100).toFixed(1)}%`);
+  });
 }
 
 function quoteLines(ctx: CopyContext): string[] {
@@ -102,17 +134,56 @@ function statusLine(ctx: CopyContext): string | null {
 export function buildCopyCandidates(ctx: CopyContext): string[] {
   const candidates = [
     itemLine(ctx),
+    ...dailyItemLines(ctx),
     ...nearbyLines(ctx),
     ...wishLines(ctx),
+    ...encouragementLines(ctx),
+    ...daoLines(ctx),
     ...quoteLines(ctx),
     statusLine(ctx),
   ].filter((line): line is string => line !== null);
   return candidates.length > 0 ? candidates : [prefix(ctx.nickname, "继续加油，今天也会有收获")];
 }
 
-export function pickCopy(ctx: CopyContext, rotateSeconds = 30): string {
-  const candidates = buildCopyCandidates(ctx);
-  const interval = rotateSeconds > 0 ? rotateSeconds : 30;
-  const epochSeconds = Math.floor(ctx.now.getTime() / 1000);
-  return candidates[Math.floor(epochSeconds / interval) % candidates.length];
+function rotate<T>(lines: readonly T[], now: Date, rotateSeconds: number): T {
+  const interval = rotateSeconds > 0 ? rotateSeconds : 3600;
+  const index = Math.floor(now.getTime() / 1000 / interval) % lines.length;
+  return lines[index];
+}
+
+export function pickCopy(ctx: CopyContext, rotateSeconds = 3600): string {
+  return rotate(buildCopyCandidates(ctx), ctx.now, rotateSeconds);
+}
+
+export function isDaoCopyTime(now: Date): boolean {
+  return Math.floor(now.getTime() / 1000 / 1800) % 2 === 1;
+}
+
+export function pickCopyLines(ctx: CopyContext, rotateSeconds = 3600): [string, string, string] {
+  const wishes = wishLines(ctx);
+  const priceLines = [itemLine(ctx), ...dailyItemLines(ctx)].filter(
+    (line): line is string => line !== null,
+  );
+  const humor = encouragementLines(ctx);
+  const dao = daoLines(ctx);
+  const thirdLines = isDaoCopyTime(ctx.now)
+    ? dao
+    : humor.length > 0
+      ? humor
+      : [prefix(ctx.nickname, "下班不是生活的暂停键")];
+  return [
+    rotate(
+      wishes.length > 0
+        ? wishes
+        : [prefix(ctx.nickname, "给心愿清单添个小目标，让工资有个开心的去处")],
+      ctx.now,
+      rotateSeconds,
+    ),
+    rotate(
+      priceLines.length > 0 ? priceLines : [prefix(ctx.nickname, "好好上班，也记得好好吃饭")],
+      ctx.now,
+      rotateSeconds,
+    ),
+    rotate(thirdLines, ctx.now, 1800),
+  ];
 }

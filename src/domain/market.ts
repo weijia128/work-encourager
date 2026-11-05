@@ -10,6 +10,7 @@ export interface DailyClose {
 export interface Quote {
   readonly secid: string;
   readonly change: number;
+  readonly yearChange?: number;
   readonly asOf: string;
   readonly stale: boolean;
 }
@@ -20,6 +21,17 @@ export function monthToDateChange(closes: readonly DailyClose[], now: Date): num
   const currentMonth = closes.filter((bar) => bar.date >= monthStart && bar.date <= toDateKey(now));
   const base = beforeMonth[beforeMonth.length - 1];
   const latest = currentMonth[currentMonth.length - 1];
+  if (!base) return null;
+  if (!latest) return 0;
+  return latest.close / base.close - 1;
+}
+
+export function yearToDateChange(closes: readonly DailyClose[], now: Date): number | null {
+  const yearStart = `${now.getFullYear()}-01-01`;
+  const beforeYear = closes.filter((bar) => bar.date < yearStart);
+  const currentYear = closes.filter((bar) => bar.date >= yearStart && bar.date <= toDateKey(now));
+  const base = beforeYear[beforeYear.length - 1];
+  const latest = currentYear[currentYear.length - 1];
   if (!base) return null;
   if (!latest) return 0;
   return latest.close / base.close - 1;
