@@ -22,6 +22,7 @@ describe("TickerChips", () => {
             name: "上涨",
             change: 0.018,
             yearChange: 0.12,
+            halfYearChange: 0.05,
             asOf: "2026-11-04",
             stale: false,
           },
@@ -30,6 +31,7 @@ describe("TickerChips", () => {
             name: "下跌",
             change: -0.021,
             yearChange: -0.08,
+            halfYearChange: -0.034,
             asOf: "2026-11-04",
             stale: false,
           },
@@ -39,9 +41,15 @@ describe("TickerChips", () => {
         onChange={onChange}
       />,
     );
+    expect(screen.getByText("行情")).toBeTruthy();
+    expect(screen.queryByText("关注行情")).toBeNull();
     expect(screen.getByText("上涨 +1.8%").className).toContain("up");
     expect(screen.getByText("上涨 +1.8%").title).toContain("数据截至 2026-11-04");
     expect(screen.getByText("下跌 -2.1%").className).toContain("down");
+    fireEvent.click(screen.getByRole("button", { name: "半年" }));
+    expect(screen.getByRole("button", { name: "半年" }).getAttribute("aria-pressed")).toBe("true");
+    expect(screen.getByText("上涨 +5.0%").title).toContain("近半年涨跌幅");
+    expect(screen.getByText("下跌 -3.4%").className).toContain("down");
     fireEvent.click(screen.getByRole("button", { name: "今年" }));
     expect(screen.getByText("上涨 +12.0%")).toBeTruthy();
     expect(screen.getByText("下跌 -8.0%")).toBeTruthy();

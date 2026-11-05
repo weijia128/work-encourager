@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { isTradingTime, monthToDateChange, yearToDateChange, type Quote } from "../domain/market";
+import {
+  halfYearChange,
+  isTradingTime,
+  monthToDateChange,
+  yearToDateChange,
+  type Quote,
+} from "../domain/market";
 import { toDateKey } from "../domain/dates";
 import type { HolidayCalendar } from "../domain/holidays";
 import type { Instrument } from "../domain/settings";
@@ -20,15 +26,15 @@ function cachedForWatchlist(raw: unknown, watchlist: readonly Instrument[]): Quo
       const value = source[item.secid];
       if (!value || typeof value !== "object") return [];
       const quote = value as Partial<CachedQuote>;
+      const finiteOrUndefined = (n: unknown) =>
+        typeof n === "number" && Number.isFinite(n) ? n : undefined;
       if (typeof quote.change !== "number" || typeof quote.asOf !== "string") return [];
       const cached: CachedQuote = {
         secid: item.secid,
         name: item.name,
         change: quote.change,
-        yearChange:
-          typeof quote.yearChange === "number" && Number.isFinite(quote.yearChange)
-            ? quote.yearChange
-            : undefined,
+        yearChange: finiteOrUndefined(quote.yearChange),
+        halfYearChange: finiteOrUndefined(quote.halfYearChange),
         asOf: quote.asOf,
         stale: Boolean(quote.stale),
       };
@@ -65,6 +71,7 @@ export function useMarket(watchlist: readonly Instrument[], cal: HolidayCalendar
                 name: instrument.name,
                 change: monthToDateChange(closes, now()) ?? 0,
                 yearChange: yearToDateChange(closes, now()) ?? undefined,
+                halfYearChange: halfYearChange(closes, now()) ?? undefined,
                 asOf: latest.date,
                 stale: false,
               };

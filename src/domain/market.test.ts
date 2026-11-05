@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { EMPTY_CALENDAR } from "./holidays";
-import { isTradingTime, monthToDateChange, yearToDateChange } from "./market";
+import { halfYearChange, isTradingTime, monthToDateChange, yearToDateChange } from "./market";
 
 describe("market math", () => {
   const closes = [
@@ -21,6 +21,34 @@ describe("market math", () => {
         new Date(2026, 10, 4),
       ),
     ).toBeCloseTo(0.12);
+  });
+  it("calculates trailing six-month change from the last close on or before the base date", () => {
+    expect(
+      halfYearChange(
+        [
+          { date: "2026-04-30", close: 900 },
+          { date: "2026-05-01", close: 950 },
+          { date: "2026-05-06", close: 1000 },
+          { date: "2026-11-04", close: 1100 },
+        ],
+        new Date(2026, 10, 5),
+      ),
+    ).toBeCloseTo(1100 / 950 - 1);
+  });
+  it("clamps the six-month base date to the end of a shorter month", () => {
+    expect(
+      halfYearChange(
+        [
+          { date: "2026-02-27", close: 1000 },
+          { date: "2026-03-02", close: 2000 },
+          { date: "2026-08-31", close: 1200 },
+        ],
+        new Date(2026, 7, 31),
+      ),
+    ).toBeCloseTo(0.2);
+  });
+  it("returns null for half-year change without enough history", () => {
+    expect(halfYearChange([{ date: "2026-10-30", close: 1000 }], new Date(2026, 10, 5))).toBeNull();
   });
   it("returns zero before a current-month bar and null without a base", () => {
     expect(monthToDateChange([{ date: "2026-10-30", close: 1000 }], new Date(2026, 10, 1))).toBe(0);

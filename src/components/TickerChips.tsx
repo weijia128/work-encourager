@@ -3,6 +3,21 @@ import type { Quote } from "../domain/market";
 import type { Instrument } from "../domain/settings";
 import { AddInstrumentDialog } from "./AddInstrumentDialog";
 
+type Period = "month" | "halfYear" | "year";
+
+const PERIODS: readonly { key: Period; label: string; title: string }[] = [
+  { key: "month", label: "本月", title: "本月涨跌幅" },
+  { key: "halfYear", label: "半年", title: "近半年涨跌幅" },
+  { key: "year", label: "今年", title: "今年涨跌幅" },
+];
+
+function changeFor(quote: Quote | undefined, period: Period): number | undefined {
+  if (!quote) return undefined;
+  if (period === "month") return quote.change;
+  if (period === "halfYear") return quote.halfYearChange;
+  return quote.yearChange;
+}
+
 export default function TickerChips({
   watchlist,
   quotes,
@@ -17,8 +32,8 @@ export default function TickerChips({
   onChange: (next: Instrument[]) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const [period, setPeriod] = useState<"month" | "year">("month");
-  const periodLabel = period === "month" ? "本月" : "今年";
+  const [period, setPeriod] = useState<Period>("month");
+  const { title: periodTitle } = PERIODS.find((item) => item.key === period) ?? PERIODS[0];
   const remove = (secid: string) => onChange(watchlist.filter((item) => item.secid !== secid));
   const add = (instrument: Instrument) => {
     if (!watchlist.some((item) => item.secid === instrument.secid)) {
@@ -29,25 +44,20 @@ export default function TickerChips({
   return (
     <section className="ticker-section" aria-label="关注品种">
       <div className="section-heading">
-        <span>关注行情</span>
+        <span>行情</span>
         <div className="ticker-actions">
           <div className="market-period" aria-label="行情周期">
-            <button
-              type="button"
-              className={period === "month" ? "active" : ""}
-              aria-pressed={period === "month"}
-              onClick={() => setPeriod("month")}
-            >
-              本月
-            </button>
-            <button
-              type="button"
-              className={period === "year" ? "active" : ""}
-              aria-pressed={period === "year"}
-              onClick={() => setPeriod("year")}
-            >
-              今年
-            </button>
+            {PERIODS.map((item) => (
+              <button
+                key={item.key}
+                type="button"
+                className={period === item.key ? "active" : ""}
+                aria-pressed={period === item.key}
+                onClick={() => setPeriod(item.key)}
+              >
+                {item.label}
+              </button>
+            ))}
           </div>
           <button
             type="button"
@@ -64,13 +74,13 @@ export default function TickerChips({
       <div className="ticker-chips">
         {watchlist.map((item) => {
           const quote = quotes[item.secid];
-          const quoteValue = period === "month" ? quote?.change : quote?.yearChange;
+          const quoteValue = changeFor(quote, period);
           const value = quoteValue ?? 0;
           return (
             <span
               className={`ticker-chip ${value >= 0 ? "up" : "down"}`}
               key={item.secid}
-              title={quote ? `${periodLabel}涨跌幅 · 数据截至 ${quote.asOf}` : "等待行情数据"}
+              title={quote ? `${periodTitle} · 数据截至 ${quote.asOf}` : "等待行情数据"}
             >
               {item.name}{" "}
               {quoteValue !== undefined
