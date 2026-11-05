@@ -79,8 +79,8 @@ export default function Panel({
   };
   return (
     <main className="panel">
-      <header>
-        <b>上班鼓励器</b>
+      <header data-tauri-drag-region>
+        <b data-tauri-drag-region>上班鼓励器</b>
         <button type="button" onClick={() => onOpenSettings(false)}>
           设置
         </button>

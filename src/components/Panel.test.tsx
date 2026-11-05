@@ -46,6 +46,12 @@ describe("Panel", () => {
       </ServicesProvider>,
     );
     expect(screen.getByText("上班鼓励器")).toBeTruthy();
+    const header = screen.getByText("上班鼓励器").closest("header");
+    expect(header?.hasAttribute("data-tauri-drag-region")).toBe(true);
+    expect(screen.getByText("上班鼓励器").hasAttribute("data-tauri-drag-region")).toBe(true);
+    expect(
+      screen.getByRole("button", { name: "设置" }).hasAttribute("data-tauri-drag-region"),
+    ).toBe(false);
     expect(screen.getByText("恒纪元 · 距元旦 58 天")).toBeTruthy();
     expect(screen.getByText("小叶，上班中")).toBeTruthy();
     expect(screen.getByText("¥600.0000")).toBeTruthy();

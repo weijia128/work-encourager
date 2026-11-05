@@ -98,6 +98,17 @@ button {
   color: #7b8794;
 }
 
+.drag-strip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 28px;
+  z-index: 1000;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 .panel {
   width: 100%;
   max-width: 380px;
