@@ -2,7 +2,10 @@ import { secondsSinceMidnight, toDateKey } from "./dates";
 import { isTradingDay } from "./workdays";
 import type { HolidayCalendar } from "./holidays";
 
-export interface DailyClose { readonly date: string; readonly close: number }
+export interface DailyClose {
+  readonly date: string;
+  readonly close: number;
+}
 
 export interface Quote {
   readonly secid: string;

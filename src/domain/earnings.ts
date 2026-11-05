@@ -10,12 +10,7 @@ export interface WorkSchedule {
   restPolicy: RestPolicy;
 }
 
-export type WorkStatus =
-  | "beforeWork"
-  | "working"
-  | "lunch"
-  | "afterWork"
-  | "restDay";
+export type WorkStatus = "beforeWork" | "working" | "lunch" | "afterWork" | "restDay";
 
 export interface Snapshot {
   status: WorkStatus;
@@ -92,8 +87,7 @@ function parseDayShape(schedule: WorkSchedule): DayShape {
         end: parseHHMM(schedule.lunch.end) * 60,
       }
     : null;
-  const dailySeconds =
-    end - start - (lunchSecs ? lunchSecs.end - lunchSecs.start : 0);
+  const dailySeconds = end - start - (lunchSecs ? lunchSecs.end - lunchSecs.start : 0);
   return { start, end, lunchSecs, dailySeconds };
 }
 
@@ -105,10 +99,7 @@ function workedSecondsAt(
 ): number {
   const clamped = Math.min(Math.max(secs, start), end);
   const overlap = lunchSecs
-    ? Math.max(
-        0,
-        Math.min(clamped, lunchSecs.end) - Math.max(start, lunchSecs.start),
-      )
+    ? Math.max(0, Math.min(clamped, lunchSecs.end) - Math.max(start, lunchSecs.start))
     : 0;
   return clamped - start - overlap;
 }
@@ -166,11 +157,7 @@ function todaySlice(
   };
 }
 
-export function computeSnapshot(
-  now: Date,
-  schedule: WorkSchedule,
-  cal: HolidayCalendar,
-): Snapshot {
+export function computeSnapshot(now: Date, schedule: WorkSchedule, cal: HolidayCalendar): Snapshot {
   const today = toDateKey(now);
   const yearMonth = [now.getFullYear(), now.getMonth() + 1] as const;
   const workdays = workdaysInMonth(...yearMonth, schedule.restPolicy, cal);

@@ -1,9 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  computeSnapshot,
-  STATUS_LABEL,
-  type WorkSchedule,
-} from "./earnings";
+import { computeSnapshot, STATUS_LABEL, type WorkSchedule } from "./earnings";
 import { EMPTY_CALENDAR } from "./holidays";
 
 const schedule: WorkSchedule = {

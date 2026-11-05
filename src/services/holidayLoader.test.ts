@@ -19,7 +19,9 @@ describe("loadCalendar", () => {
     const fetchJson = vi.fn().mockResolvedValue({ year: 2027, days: [day] });
     const calendar = await loadCalendar([2027], kv, fetchJson);
     expect(calendar.get("2027-01-01")).toEqual(day);
-    expect(fetchJson).toHaveBeenCalledWith("https://cdn.jsdelivr.net/gh/NateScarlet/holiday-cn@master/2027.json");
+    expect(fetchJson).toHaveBeenCalledWith(
+      "https://cdn.jsdelivr.net/gh/NateScarlet/holiday-cn@master/2027.json",
+    );
     await expect(kv.get("holidays:2027")).resolves.toEqual({ year: 2027, days: [day] });
   });
 

@@ -2,9 +2,7 @@ import { parseDateKey, toDateKey, mondayOf } from "./dates";
 import type { HolidayCalendar } from "./holidays";
 
 export type RestPolicy =
-  | { kind: "double" }
-  | { kind: "single" }
-  | { kind: "bigSmall"; smallWeekMonday: string };
+  { kind: "double" } | { kind: "single" } | { kind: "bigSmall"; smallWeekMonday: string };
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -26,11 +24,7 @@ function policyWorkday(date: string, policy: RestPolicy): boolean {
   }
 }
 
-export function isWorkday(
-  date: string,
-  policy: RestPolicy,
-  cal: HolidayCalendar,
-): boolean {
+export function isWorkday(date: string, policy: RestPolicy, cal: HolidayCalendar): boolean {
   const entry = cal.get(date);
   if (entry) return !entry.isOffDay;
   return policyWorkday(date, policy);

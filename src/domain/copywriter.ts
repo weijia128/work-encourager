@@ -68,9 +68,11 @@ function lunchStartCountdown(ctx: CopyContext): number | null {
 function wishLines(ctx: CopyContext): string[] {
   return ctx.wishlist
     .map((wish) => ctx.snapshot.monthEarned / wish.price)
-    .map((count, index) => count >= 0.1
-      ? prefix(ctx.nickname, `本月已经赚出 ${count.toFixed(1)} 个 ${ctx.wishlist[index].name}`)
-      : null)
+    .map((count, index) =>
+      count >= 0.1
+        ? prefix(ctx.nickname, `本月已经赚出 ${count.toFixed(1)} 个 ${ctx.wishlist[index].name}`)
+        : null,
+    )
     .filter((line): line is string => line !== null);
 }
 
@@ -89,7 +91,10 @@ function statusLine(ctx: CopyContext): string | null {
     return prefix(ctx.nickname, `今天休息，本月已赚 ¥${snapshot.monthEarned.toFixed(2)}`);
   }
   if (snapshot.status === "beforeWork" && snapshot.countdown) {
-    return prefix(ctx.nickname, `还有 ${formatDuration(snapshot.countdown.seconds)} 上班，今天又是纯赚的一天`);
+    return prefix(
+      ctx.nickname,
+      `还有 ${formatDuration(snapshot.countdown.seconds)} 上班，今天又是纯赚的一天`,
+    );
   }
   return null;
 }

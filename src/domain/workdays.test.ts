@@ -1,18 +1,7 @@
 import { describe, it, expect } from "vitest";
-import {
-  isWorkday,
-  workdaysInMonth,
-  isTradingDay,
-  type RestPolicy,
-} from "./workdays";
+import { isWorkday, workdaysInMonth, isTradingDay, type RestPolicy } from "./workdays";
 import { buildCalendar, EMPTY_CALENDAR } from "./holidays";
-import {
-  toDateKey,
-  parseDateKey,
-  parseHHMM,
-  secondsSinceMidnight,
-  mondayOf,
-} from "./dates";
+import { toDateKey, parseDateKey, parseHHMM, secondsSinceMidnight, mondayOf } from "./dates";
 
 const double: RestPolicy = { kind: "double" };
 const single: RestPolicy = { kind: "single" };
@@ -73,16 +62,12 @@ describe("isWorkday", () => {
   });
 
   it("calendar off-day overrides policy", () => {
-    const cal = buildCalendar([
-      { name: "调休", date: "2026-11-06", isOffDay: true },
-    ]);
+    const cal = buildCalendar([{ name: "调休", date: "2026-11-06", isOffDay: true }]);
     expect(isWorkday("2026-11-06", double, cal)).toBe(false);
   });
 
   it("calendar 补班 day overrides policy", () => {
-    const cal = buildCalendar([
-      { name: "补班", date: "2026-11-08", isOffDay: false },
-    ]);
+    const cal = buildCalendar([{ name: "补班", date: "2026-11-08", isOffDay: false }]);
     expect(isWorkday("2026-11-08", single, cal)).toBe(true);
   });
 });
@@ -101,15 +86,11 @@ describe("isTradingDay", () => {
     expect(isTradingDay("2026-11-04", EMPTY_CALENDAR)).toBe(true);
   });
   it("is false on a 补班 Saturday", () => {
-    const cal = buildCalendar([
-      { name: "补班", date: "2026-11-07", isOffDay: false },
-    ]);
+    const cal = buildCalendar([{ name: "补班", date: "2026-11-07", isOffDay: false }]);
     expect(isTradingDay("2026-11-07", cal)).toBe(false);
   });
   it("is false on a statutory off-day weekday", () => {
-    const cal = buildCalendar([
-      { name: "节假日", date: "2026-11-04", isOffDay: true },
-    ]);
+    const cal = buildCalendar([{ name: "节假日", date: "2026-11-04", isOffDay: true }]);
     expect(isTradingDay("2026-11-04", cal)).toBe(false);
   });
 });

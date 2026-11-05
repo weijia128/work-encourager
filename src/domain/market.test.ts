@@ -13,7 +13,9 @@ describe("market math", () => {
   });
   it("returns zero before a current-month bar and null without a base", () => {
     expect(monthToDateChange([{ date: "2026-10-30", close: 1000 }], new Date(2026, 10, 1))).toBe(0);
-    expect(monthToDateChange([{ date: "2026-11-04", close: 1018 }], new Date(2026, 10, 4))).toBeNull();
+    expect(
+      monthToDateChange([{ date: "2026-11-04", close: 1018 }], new Date(2026, 10, 4)),
+    ).toBeNull();
   });
   it("recognizes exchange sessions", () => {
     expect(isTradingTime(new Date("2026-11-04T10:00:00"), EMPTY_CALENDAR)).toBe(true);

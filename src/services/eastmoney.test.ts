@@ -16,7 +16,9 @@ describe("eastmoney provider", () => {
   it("parses only mainland markets from search", () => {
     const instruments = parseSearch(fixtureSearch);
     expect(instruments.some((item) => item.secid === "1.000300")).toBe(true);
-    expect(instruments.every((item) => item.secid.startsWith("0.") || item.secid.startsWith("1."))).toBe(true);
+    expect(
+      instruments.every((item) => item.secid.startsWith("0.") || item.secid.startsWith("1.")),
+    ).toBe(true);
   });
   it("builds endpoint URLs", async () => {
     const urls: string[] = [];

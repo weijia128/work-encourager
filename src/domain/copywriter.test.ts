@@ -44,37 +44,47 @@ describe("buildCopyCandidates", () => {
   it("uses the configured lunch start and final thirty-minute lines", () => {
     const lunchSoon = buildCopyCandidates(contextAt("2026-11-04T11:45:00"));
     expect(lunchSoon).toContain("小叶，坚持住，还有 15 分钟开饭");
-    const customLunch = buildCopyCandidates(contextAt("2026-11-04T11:10:00", {
-      lunchStart: "11:30",
-    }));
+    const customLunch = buildCopyCandidates(
+      contextAt("2026-11-04T11:10:00", {
+        lunchStart: "11:30",
+      }),
+    );
     expect(customLunch).toContain("小叶，坚持住，还有 20 分钟开饭");
-    const afterLunch = buildCopyCandidates(contextAt("2026-11-04T11:45:00", {
-      lunchStart: "11:30",
-    }));
+    const afterLunch = buildCopyCandidates(
+      contextAt("2026-11-04T11:45:00", {
+        lunchStart: "11:30",
+      }),
+    );
     expect(afterLunch.some((line) => line.includes("开饭"))).toBe(false);
-    const noLunch = buildCopyCandidates(contextAt("2026-11-04T11:10:00", {
-      lunchStart: null,
-    }));
+    const noLunch = buildCopyCandidates(
+      contextAt("2026-11-04T11:10:00", {
+        lunchStart: null,
+      }),
+    );
     expect(noLunch.some((line) => line.includes("开饭"))).toBe(false);
     const finalMinutes = buildCopyCandidates(contextAt("2026-11-04T17:40:00"));
     expect(finalMinutes).toContain("小叶，最后 20 分钟，每一秒都是纯赚");
   });
 
   it("formats wishes to one decimal place", () => {
-    const lines = buildCopyCandidates(contextAt("2026-11-04T15:00:00", {
-      wishlist: [{ name: "新书", price: 1000 }],
-    }));
+    const lines = buildCopyCandidates(
+      contextAt("2026-11-04T15:00:00", {
+        wishlist: [{ name: "新书", price: 1000 }],
+      }),
+    );
     expect(lines).toContain("小叶，本月已经赚出 2.6 个 新书");
   });
 
   it("beats only non-stale quotes below month progress", () => {
-    const lines = buildCopyCandidates(contextAt("2026-11-04T15:00:00", {
-      quotes: [
-        { name: "沪深300", secid: "1.000300", change: 0.1, asOf: "2026-11-04", stale: false },
-        { name: "科创50", secid: "1.000688", change: 0.1, asOf: "2026-11-04", stale: true },
-        { name: "黄金ETF", secid: "1.518880", change: 0.9, asOf: "2026-11-04", stale: false },
-      ],
-    }));
+    const lines = buildCopyCandidates(
+      contextAt("2026-11-04T15:00:00", {
+        quotes: [
+          { name: "沪深300", secid: "1.000300", change: 0.1, asOf: "2026-11-04", stale: false },
+          { name: "科创50", secid: "1.000688", change: 0.1, asOf: "2026-11-04", stale: true },
+          { name: "黄金ETF", secid: "1.518880", change: 0.9, asOf: "2026-11-04", stale: false },
+        ],
+      }),
+    );
     expect(lines).toContain("小叶，本月上班又跑赢了沪深300 ✌️");
     expect(lines.some((line) => line.includes("科创50"))).toBe(false);
     expect(lines.some((line) => line.includes("黄金ETF"))).toBe(false);
@@ -90,7 +100,9 @@ describe("buildCopyCandidates", () => {
 
 describe("ITEMS", () => {
   it("is sorted by ascending price", () => {
-    expect(ITEMS.every((item, index) => index === 0 || ITEMS[index - 1].price <= item.price)).toBe(true);
+    expect(ITEMS.every((item, index) => index === 0 || ITEMS[index - 1].price <= item.price)).toBe(
+      true,
+    );
   });
 });
 

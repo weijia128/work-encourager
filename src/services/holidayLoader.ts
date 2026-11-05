@@ -1,10 +1,19 @@
 import bundled2026 from "../data/holidays/2026.json";
-import { buildCalendar, parseHolidayCn, type HolidayCalendar, type HolidayDay } from "../domain/holidays";
+import {
+  buildCalendar,
+  parseHolidayCn,
+  type HolidayCalendar,
+  type HolidayDay,
+} from "../domain/holidays";
 import type { KeyValueStore } from "./kvStore";
 
 const URL_BASE = "https://cdn.jsdelivr.net/gh/NateScarlet/holiday-cn@master";
 
-async function loadYear(year: number, kv: KeyValueStore, fetchJson: (url: string) => Promise<unknown>): Promise<HolidayDay[]> {
+async function loadYear(
+  year: number,
+  kv: KeyValueStore,
+  fetchJson: (url: string) => Promise<unknown>,
+): Promise<HolidayDay[]> {
   if (year === 2026) return parseHolidayCn(bundled2026);
   const cacheKey = `holidays:${year}`;
   try {
@@ -27,8 +36,12 @@ async function loadYear(year: number, kv: KeyValueStore, fetchJson: (url: string
   }
 }
 
-export async function loadCalendar(years: readonly number[], kv: KeyValueStore, fetchJson: (url: string) => Promise<unknown>): Promise<HolidayCalendar> {
+export async function loadCalendar(
+  years: readonly number[],
+  kv: KeyValueStore,
+  fetchJson: (url: string) => Promise<unknown>,
+): Promise<HolidayCalendar> {
   const days: HolidayDay[] = [];
-  for (const year of years) days.push(...await loadYear(year, kv, fetchJson));
+  for (const year of years) days.push(...(await loadYear(year, kv, fetchJson)));
   return buildCalendar(days);
 }

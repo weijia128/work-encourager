@@ -12,6 +12,6 @@ export function createTauriPlatform(): Platform {
   return {
     setTrayStatus: (title, tooltip, badge) => invoke("set_tray_status", { title, tooltip, badge }),
     setAlwaysOnTop: (on) => getCurrentWindow().setAlwaysOnTop(on),
-    setAutostart: (on) => on ? enable() : disable(),
+    setAutostart: (on) => (on ? enable() : disable()),
   };
 }

@@ -30,7 +30,16 @@ describe("settingsSchema", () => {
     ["overnight", { workEnd: "08:00" }, "下班时间必须晚于上班时间"],
     ["lunch outside", { lunch: { start: "08:00", end: "09:00" } }, "午休必须在工作时间内"],
     ["lunch reversed", { lunch: { start: "13:00", end: "12:00" } }, "午休结束时间必须晚于开始时间"],
-    ["duplicate watchlist", { watchlist: [{ secid: "1.000300", name: "沪深300" }, { secid: "1.000300", name: "重复" }] }, "关注品种不能重复"],
+    [
+      "duplicate watchlist",
+      {
+        watchlist: [
+          { secid: "1.000300", name: "沪深300" },
+          { secid: "1.000300", name: "重复" },
+        ],
+      },
+      "关注品种不能重复",
+    ],
     ["bad wish price", { wishlist: [{ name: "x", price: 0 }] }, "心愿价格必须大于0"],
   ])("rejects %s with Chinese message", (_name, patch, message) => {
     const result = settingsSchema.safeParse({ ...valid, ...patch });
