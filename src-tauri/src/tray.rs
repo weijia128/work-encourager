@@ -107,3 +107,16 @@ pub fn set_tray_status<R: Runtime>(
     }
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{TRAY_BADGE_ICON, TRAY_ICON, icon};
+
+    #[test]
+    fn tray_icons_decode_to_32_pixels() {
+        for bytes in [TRAY_ICON, TRAY_BADGE_ICON] {
+            let image = icon(bytes).expect("tray icon should decode");
+            assert_eq!((image.width(), image.height()), (32, 32));
+        }
+    }
+}
