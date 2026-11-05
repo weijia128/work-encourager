@@ -9,7 +9,8 @@ import { useNow } from "../hooks/useNow";
 import { useTraySync } from "../hooks/useTraySync";
 import { useMarket } from "../hooks/useMarket";
 import { useCopyLibrary } from "../hooks/useCopyLibrary";
-import { useEffect, useState } from "react";
+import { useFitWindow } from "../hooks/useFitWindow";
+import { useEffect, useRef, useState } from "react";
 import { loadMerit, saveMerit } from "../services/settingsRepo";
 import { useServices } from "../services/ServicesContext";
 import { tapMerit, type Merit } from "../domain/merit";
@@ -45,6 +46,8 @@ export default function Panel({
   const snapshot = liveSnapshot ?? computeSnapshot(now, settings, calendar);
   const { quotes, refresh: refreshQuotes, refreshing } = useMarket(settings.watchlist, calendar);
   const copyLibrary = useCopyLibrary();
+  const panelRef = useRef<HTMLElement>(null);
+  useFitWindow(panelRef);
   const [merit, setMerit] = useState<Merit>(() => ({ date: toDateKey(now), today: 0, total: 0 }));
   useEffect(() => {
     void loadMerit<Merit>(kv).then((stored) => {
@@ -78,7 +81,7 @@ export default function Panel({
     void saveMerit(kv, next);
   };
   return (
-    <main className="panel">
+    <main className="panel" ref={panelRef}>
       <header data-tauri-drag-region>
         <b data-tauri-drag-region>上班鼓励器</b>
         <button type="button" onClick={() => onOpenSettings(false)}>

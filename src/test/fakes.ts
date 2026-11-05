@@ -39,5 +39,6 @@ export function createFakePlatform(): Platform & {
     setTrayStatus: (...args) => record("setTrayStatus", ...args),
     setAlwaysOnTop: (...args) => record("setAlwaysOnTop", ...args),
     setAutostart: (...args) => record("setAutostart", ...args),
+    setWindowHeight: (...args) => record("setWindowHeight", ...args),
   };
 }

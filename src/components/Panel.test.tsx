@@ -5,6 +5,7 @@ import { ServicesProvider } from "../services/ServicesContext";
 import { createFakeMarketProvider, createFakePlatform } from "../test/fakes";
 import { buildCalendar, EMPTY_CALENDAR } from "../domain/holidays";
 import type { Settings } from "../domain/settings";
+import { DEFAULT_WINDOW_HEIGHT, MIN_WINDOW_HEIGHT } from "../domain/windowFit";
 
 const settings: Settings = {
   nickname: "小叶",
@@ -59,6 +60,34 @@ describe("Panel", () => {
     expect(screen.getByText("本月进度").parentElement?.textContent).toContain("第 3/21 天");
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(platform.calls.find((call) => call.method === "setTrayStatus")?.args[0]).toBe("¥600");
+  });
+  it("fits the window to the panel and restores the default height on unmount", async () => {
+    const platform = createFakePlatform();
+    const view = render(
+      <ServicesProvider
+        services={{
+          kv: { get: async () => undefined, set: async () => undefined },
+          market: createFakeMarketProvider(),
+          platform,
+          now: () => new Date(2026, 10, 4, 15),
+        }}
+      >
+        <Panel
+          settings={settings}
+          calendar={EMPTY_CALENDAR}
+          onOpenSettings={() => undefined}
+          onSettingsChange={() => undefined}
+        />
+      </ServicesProvider>,
+    );
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const heights = () =>
+      platform.calls
+        .filter((call) => call.method === "setWindowHeight")
+        .map((call) => call.args[0]);
+    expect(heights()).toEqual([MIN_WINDOW_HEIGHT]);
+    view.unmount();
+    expect(heights()).toEqual([MIN_WINDOW_HEIGHT, DEFAULT_WINDOW_HEIGHT]);
   });
   it("hides sensitive progress details without hiding percentages", () => {
     const first = new Date(2026, 10, 4, 15);
