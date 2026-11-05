@@ -1,0 +1,7 @@
+dist
+coverage
+src-tauri
+pnpm-lock.yaml
+docs
+reviews
+.superpowers
