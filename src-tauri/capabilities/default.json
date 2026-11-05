@@ -2,7 +2,9 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "Capability for the main window",
-  "windows": ["main"],
+  "windows": [
+    "main"
+  ],
   "permissions": [
     "core:default",
     "opener:default",
@@ -11,9 +13,17 @@
     {
       "identifier": "http:allow-fetch",
       "allow": [
-        { "url": "https://*.eastmoney.com/*" },
-        { "url": "https://cdn.jsdelivr.net/*" }
+        {
+          "url": "https://*.eastmoney.com/*"
+        },
+        {
+          "url": "https://cdn.jsdelivr.net/*"
+        }
       ]
-    }
+    },
+    "core:window:allow-set-always-on-top",
+    "autostart:allow-enable",
+    "autostart:allow-disable",
+    "autostart:allow-is-enabled"
   ]
 }

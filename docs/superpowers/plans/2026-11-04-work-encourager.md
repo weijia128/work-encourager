@@ -330,19 +330,19 @@ interface Platform {
 createTauriPlatform(): Platform
 ```
 
-- [ ] **Step 1:** Configure the window in `tauri.conf.json`:
+- [x] **Step 1:** Configure the window in `tauri.conf.json`:
   - label `main`, 380×680, not resizable, `alwaysOnTop: true`, `backgroundThrottling: "disabled"`, title `上班鼓励器`.
-- [ ] **Step 2:** Configure the tray in `tray.rs`:
+- [x] **Step 2:** Configure the tray in `tray.rs`:
   - Tray id `main` with the menu `显示面板` / `退出`, and `show_menu_on_left_click(false)`.
   - A left click toggles the `main` window: if hidden, show and focus it; otherwise hide it.
   - `退出` calls `app.exit(0)`.
-- [ ] **Step 3:** Configure app behaviour in `lib.rs`:
+- [x] **Step 3:** Configure app behaviour in `lib.rs`:
   - On `WindowEvent::CloseRequested` for `main`, call `api.prevent_close()` and hide the window.
   - On macOS, set `ActivationPolicy::Accessory` so the app is menu-bar only with no Dock icon.
   - Register `tauri-plugin-single-instance`. A second launch shows the existing panel.
   - Register `tauri-plugin-autostart`.
   - Register `set_tray_status`.
-- [ ] **Step 4:** Implement `createTauriPlatform` using `invoke`, `getCurrentWindow().setAlwaysOnTop` and the autostart plugin's `enable` / `disable`.
+- [x] **Step 4:** Implement `createTauriPlatform` using `invoke`, `getCurrentWindow().setAlwaysOnTop` and the autostart plugin's `enable` / `disable`.
 - [ ] **Step 5:** Temporary check. Call `setTrayStatus('💰 ¥0.00', '上班鼓励器', false)` in `main.tsx` on a 1 s interval with an incrementing number. Run `pnpm tauri dev`, then verify:
   - (a) The menu bar shows the text, and it ticks.
   - (b) Closing the panel keeps the app and the menu bar running.
@@ -350,7 +350,7 @@ createTauriPlatform(): Platform
   - (d) After 5 minutes with the panel hidden, the number is still ticking each second.
   - (e) `退出` quits.
   Remove the temporary code afterwards.
-- [ ] **Step 6:** Run `cargo clippy --manifest-path src-tauri/Cargo.toml -- -D warnings`. Expected: no warnings.
+- [x] **Step 6:** Run `cargo clippy --manifest-path src-tauri/Cargo.toml -- -D warnings`. Expected: no warnings.
 - [ ] **Step 7:** Commit `feat: menu bar tray shell with hide-on-close`.
 
 ### Task 7: Services context and setup wizard

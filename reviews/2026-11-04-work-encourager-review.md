@@ -132,3 +132,45 @@ Users set their own lunch time (or none). With lunch 11:30–12:30 the `开饭` 
 All four issues fixed: `CopyContext.lunchStart` added (plan updated), lunch countdown uses the user's lunch start via `parseHHMM`, null lunch suppresses the line, with tests; `ITEMS` ascending with a test; item renamed; stray re-export removed.
 
 ### Verdict: APPROVED
+
+---
+
+## Code Review Round 7 — 2026-11-04
+
+**Scope**: Task 6 — `src-tauri/src/{lib,tray}.rs`, `tauri.conf.json`, capabilities, tray icons, `src/services/platform.ts`, `src/App.tsx`
+**Build Status**: PASS (`cargo clippy --offline -D warnings` clean, `pnpm test` 64/64, `pnpm build` clean); `cargo fmt --check` FAILS
+
+Window config matches the plan (380×680, fixed, always-on-top, `backgroundThrottling: "disabled"`), close→hide, Accessory policy, single-instance shows the panel, badge switches template off so the red dot keeps its colour. Good.
+
+### Issues
+
+#### Issue 1 (Medium): tray icon is decoded and re-set on every tick
+**File**: src-tauri/src/tray.rs:55 (`set_tray_status`)
+The frontend calls this once per second. Re-decoding the PNG and calling `set_icon_with_as_template` every second wastes CPU and can make the menu-bar icon flicker on macOS.
+**Fix**: Keep the last badge state in managed state (e.g. `struct TrayBadge(Mutex<Option<bool>>)` registered with `.manage(...)`), and only swap the icon when the badge value changes. Title/tooltip may still update every tick.
+
+#### Issue 2 (Medium): menu item `显示面板` toggles instead of showing
+**File**: src-tauri/src/tray.rs:43
+If the panel is already visible, choosing `显示面板` hides it — contrary to its label.
+**Fix**: Add `show_window` (show + unminimize + set_focus) for the menu item and the single-instance callback; keep `toggle_window` for left-click only.
+
+#### Issue 3 (Low): Rust code not rustfmt-formatted
+**Fix**: Run `cargo fmt --manifest-path src-tauri/Cargo.toml`.
+
+#### Issue 4 (Low): window errors silently discarded in `toggle_window`
+**File**: src-tauri/src/tray.rs:33 — `let _ = result;` hides failures. Acceptable for a UI click handler; consider `eprintln!` in debug builds only. Optional.
+
+### Verdict: NEEDS_FIX (Medium items fixed now because Issue 1 affects the every-second hot path)
+
+---
+
+## Code Review Round 8 — 2026-11-05
+
+**Scope**: fixes for Round 7 + Task 6 Step 5 manual check
+**Build Status**: PASS (`cargo fmt --check`, `cargo clippy --offline -D warnings`, `pnpm test` 64/64, `pnpm build`)
+
+Issues 1–3 fixed: badge icon swapped only on change via managed `TrayBadge` state; `显示面板` and single-instance now call `show_window`; rustfmt applied. Issue 4 left as-is (optional, accepted).
+
+Manual check (temporary harness in `main.tsx`, reverted): user confirmed the macOS menu bar shows `💰 ¥N.00` ticking every second; it kept ticking for ~3.3 h unattended. `set_tray_status` returned no errors in the dev log. Hide/toggle/quit behaviours still to be confirmed in the final acceptance checklist (Task 12).
+
+### Verdict: APPROVED

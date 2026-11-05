@@ -12,9 +12,13 @@
   "app": {
     "windows": [
       {
-        "title": "work-encourager",
-        "width": 800,
-        "height": 600
+        "title": "上班鼓励器",
+        "width": 380,
+        "height": 680,
+        "label": "main",
+        "resizable": false,
+        "alwaysOnTop": true,
+        "backgroundThrottling": "disabled"
       }
     ],
     "security": {
