@@ -41,7 +41,8 @@ describe("TickerChips", () => {
         onChange={onChange}
       />,
     );
-    expect(screen.getByText("行情")).toBeTruthy();
+    const heading = screen.getByText("反者道之动 · 贪嗔");
+    expect(heading.title).toBe("反者道之动，弱者道之用 ——《道德经》");
     expect(screen.queryByText("关注行情")).toBeNull();
     expect(screen.getByText("上涨 +1.8%").className).toContain("up");
     expect(screen.getByText("上涨 +1.8%").title).toContain("数据截至 2026-11-04");

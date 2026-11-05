@@ -5,6 +5,9 @@ import { AddInstrumentDialog } from "./AddInstrumentDialog";
 
 type Period = "month" | "halfYear" | "year";
 
+const SECTION_TITLE = "反者道之动 · 贪嗔";
+const SECTION_HINT = "反者道之动，弱者道之用 ——《道德经》";
+
 const PERIODS: readonly { key: Period; label: string; title: string }[] = [
   { key: "month", label: "本月", title: "本月涨跌幅" },
   { key: "halfYear", label: "半年", title: "近半年涨跌幅" },
@@ -44,7 +47,7 @@ export default function TickerChips({
   return (
     <section className="ticker-section" aria-label="关注品种">
       <div className="section-heading">
-        <span>行情</span>
+        <span title={SECTION_HINT}>{SECTION_TITLE}</span>
         <div className="ticker-actions">
           <div className="market-period" aria-label="行情周期">
             {PERIODS.map((item) => (
