@@ -521,14 +521,14 @@ The button is 🪵. Each tap shows a floating `功德 +1` for 800 ms. It shows `
 
 `SettingsView` wraps `SetupWizard` with `initial={settings}`. The submit label is `保存`, and a `取消` link returns to the panel. When saving, preserve `lastConfirmedMonth`; only the first-run setup stamps it. After saving, App re-applies `alwaysOnTop` and `autostart`, and the panel recomputes immediately.
 
-- [ ] **Step 1:** Write the failing tests:
+- [x] **Step 1:** Write the failing tests:
   - `prefills current values`
   - `saving new salary calls onSave with updated salary and same lastConfirmedMonth`
   - `toggling 面板置顶 off calls platform.setAlwaysOnTop(false) after save` (App-level test)
-- [ ] **Step 2:** Run it. Expected: FAIL.
-- [ ] **Step 3:** Implement. This needs a `submitLabel` prop on `SetupWizard` and a `stampMonth` flag.
-- [ ] **Step 4:** Run it. Expected: PASS.
-- [ ] **Step 5:** Commit `feat: editable settings view`.
+- [x] **Step 2:** Run it. Expected: FAIL.
+- [x] **Step 3:** Implement. This needs a `submitLabel` prop on `SetupWizard` and a `stampMonth` flag.
+- [x] **Step 4:** Run it. Expected: PASS.
+- [x] **Step 5:** Commit `feat: editable settings view`.
 
 ### Task 12: Cross-platform build and acceptance
 

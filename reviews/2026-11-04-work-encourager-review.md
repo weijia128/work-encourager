@@ -261,3 +261,7 @@ Round 10 notes fixed (debug footer and memo removed; chip × only; `恢复默认
 `monthPrompt.ts` reimplements the month string twice (reuse `monthKey`); the calendar effect in `App.tsx` depends on `services.market` for no reason; the `dateText` builder in `Panel.tsx` should be a small `formatClock(now)` helper in `dates.ts` with a test.
 
 ### Verdict: NEEDS_FIX — committed as-is because it is functional, with the fixes going into the next Codex run together with Task 11
+
+### Round 11 follow-up — 2026-11-05
+
+All five Round 11 issues were fixed: copy rotation now uses `pickCopy`; live snapshot and tray synchronization remain mounted while SettingsView is open; month-prompt edits confirm the current month after saving; tray tooltips include nickname and exact status; and date/month helper duplication was removed with `formatClock` coverage. Task 11 is implemented with a formal SettingsView, cancel flow, preserved month confirmation, and platform-setting reapplication.
