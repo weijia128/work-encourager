@@ -4,7 +4,7 @@
 
 **Goal:** A Tauri 2 desktop app for macOS and Windows. It shows today's earnings live in the menu bar or tray and in a floating panel. It compares "本月上班进度" with the month-to-date change of A-share instruments, and includes rotating fun copy plus a 功德木鱼 button.
 
-**Architecture:** All business rules are pure TypeScript functions in `src/domain/`: workdays, earnings snapshot, market math and copy. They take `now: Date` explicitly and are unit-tested to ≥80%. Side effects sit behind small interfaces in `src/services/` (key-value store, market provider, platform/tray) and are injected through React context, so components test with fakes. The Rust side is a thin shell. It handles the tray/menu-bar, hide-on-close, single instance and plugins, and exposes one command (`set_tray_status`) that the frontend calls once per second.
+**Architecture:** All business rules are pure TypeScript functions in `src/domain/`: workdays, earnings snapshot, market math and copy. They take `now: Date` explicitly and are unit-tested to ≥80%. Side effects sit behind small interfaces in `src/services/` (key-value store, market provider, platform/tray) and are injected through React context, so components test with fakes. The Rust side is a thin shell. It handles the tray/menu-bar, hide-on-close, single instance and plugins, and exposes one command (`set_tray_status`) that the frontend calls once per minute (or on badge change).
 
 **Tech Stack:** Tauri 2, Rust (stable via rustup), React + TypeScript (strict) + Vite, pnpm, Vitest + @testing-library/react, zod. Tauri plugins: store, http, autostart, single-instance.
 
@@ -18,7 +18,7 @@
 - The calendar beats the rest policy. Statutory off-days are always rest, and 调休补班 days are always work. 单休 rests on Sunday. 大小周: the small week works Saturday, and weeks alternate continuously by calendar week with no reset at holidays.
 - There is no start/stop/"关闭计时器" button. Leave, overtime and other special schedules are not modelled. Settings reject overnight shifts.
 - No OS dialogs or notifications. The only prompt is the in-panel "本月设置有变化吗？", signalled by a tray-icon red dot.
-- Display: panel today-earned has 4 decimals (`¥79.2008`), menu bar/tray has 2 decimals (`💰 ¥79.20`). Up is red `#d63031`, down is green `#2e8b57`.
+- Display: panel today-earned has 4 decimals (`¥79.2008`) and ticks every second; menu bar/tray shows **whole yuan, floored** (`💰 ¥79`) and is refreshed **once per minute** (user decision 2026-11-05), plus immediately when the badge changes. Up is red `#d63031`, down is green `#2e8b57`.
 - Status labels, exact: `还没上班`, `上班中`, `午休中`, `已下班`, `今天休息`. They are shown as `{称呼}，{label}`.
 - Copy templates, exact: `再过 {剩余时间}，{物品} 就赚回来了`, `本月已经赚出 {N} 个 {心愿}`, `坚持住，还有 {m} 分钟开饭`, `最后 {m} 分钟，每一秒都是纯赚`, `本月上班又跑赢了{品种名} ✌️`. Every copy line is prefixed `{称呼}，`.
 - Default watchlist: 沪深300 `1.000300`, 科创50 `1.000688`, 黄金ETF `1.518880`. Search may add A-share indices, ETFs and stocks (market 0 or 1). No futures.
@@ -384,15 +384,15 @@ Submit is labelled `开始上班`. It validates with `settingsSchema`, shows the
 - It loads settings. `null` renders `SetupWizard`; otherwise it renders `Panel` (stub until Task 8).
 - It applies `alwaysOnTop` and `autostart` through `Platform` after every save.
 
-- [ ] **Step 1:** Write the failing tests, using fake services and a fixed `now` of 2026-11-04:
+- [x] **Step 1:** Write the failing tests, using fake services and a fixed `now` of 2026-11-04:
   - `fills valid form and calls onDone with parsed settings`
   - `shows 下班时间必须晚于上班时间 when end ≤ start`
   - `大小周 + 大周 sets smallWeekMonday to 2026-10-26`
   - `没有午休 sets lunch null`
   - `submit stamps lastConfirmedMonth 2026-11`
-- [ ] **Step 2:** Run `pnpm test src/components/SetupWizard`. Expected: FAIL.
-- [ ] **Step 3:** Implement. `main.tsx` builds the real services (`createTauriStore`, `createEastmoneyProvider(httpFetchJson)`, `createTauriPlatform`, `() => new Date()`).
-- [ ] **Step 4:** Run it. Expected: PASS. Then run `pnpm tauri dev`, fill in the form, restart the app, and check that the wizard is skipped.
+- [x] **Step 2:** Run `pnpm test src/components/SetupWizard`. Expected: FAIL.
+- [x] **Step 3:** Implement. `main.tsx` builds the real services (`createTauriStore`, `createEastmoneyProvider(httpFetchJson)`, `createTauriPlatform`, `() => new Date()`).
+- [x] **Step 4:** Run it. Expected: PASS. The automated test/build checks pass; the manual `pnpm tauri dev` check is deferred to the orchestrator.
 - [ ] **Step 5:** Commit `feat: first-run setup wizard`.
 
 ### Task 8: Main panel, tray sync, month prompt
@@ -408,7 +408,7 @@ Submit is labelled `开始上班`. It validates with `settingsSchema`, shows the
 useNow(intervalMs: number): Date
 needsMonthPrompt(now: Date, s: Settings, cal: HolidayCalendar): boolean
   // lastConfirmedMonth !== now's month AND this month's first workday at workStart <= now
-useTraySync(snapshot: Snapshot, badge: boolean): void   // calls platform.setTrayStatus once per tick
+useTraySync(snapshot: Snapshot, badge: boolean, now: Date): void   // calls platform.setTrayStatus only when floor(epochSeconds/60) changes or badge changes (and once on mount); title `💰 ¥{floor(todayEarned)}`
 Panel({ settings, calendar, onOpenSettings, onSettingsChange })
 ```
 
@@ -434,7 +434,7 @@ The layout follows `panel-v2.html` top to bottom:
     - true on 12-15 when the user missed the 1st
   - Panel, with fixed `now` 2026-11-04 15:00 and the Task 2 fixture:
     - it renders `小叶，上班中`, `¥600.0000`, `第 3/21 天`
-    - fake platform `setTrayStatus` is called with the title `💰 ¥600.00`
+    - fake platform `setTrayStatus` is called with the title `💰 ¥600`, is NOT called again for ticks within the same minute, and is called again when the minute rolls over or the badge flips
     - the `没变化` click persists `lastConfirmedMonth` and clears the badge
 - [ ] **Step 2:** Run it. Expected: FAIL.
 - [ ] **Step 3:** Implement. `useNow(1000)` drives everything, and the calendar loads once for the current and next year.

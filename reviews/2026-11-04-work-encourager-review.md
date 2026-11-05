@@ -174,3 +174,51 @@ Issues 1–3 fixed: badge icon swapped only on change via managed `TrayBadge` st
 Manual check (temporary harness in `main.tsx`, reverted): user confirmed the macOS menu bar shows `💰 ¥N.00` ticking every second; it kept ticking for ~3.3 h unattended. `set_tray_status` returned no errors in the dev log. Hide/toggle/quit behaviours still to be confirmed in the final acceptance checklist (Task 12).
 
 ### Verdict: APPROVED
+
+---
+
+## Code Review Round 9 — 2026-11-05
+
+**Scope**: Task 7 — `src/services/ServicesContext.tsx`, `src/components/SetupWizard.tsx` + test, `src/App.tsx`, `src/main.tsx`, `src/test/fakes.ts`; plus a Task 6 defect found during manual testing
+**Build Status**: PASS (`pnpm test` 68/68, `pnpm build` clean). `pnpm format:check` FAILS (Prettier now installed, printWidth 100).
+
+Behaviour is right: field order and labels match the plan, 大小周 mapping correct, lunch null, month stamped, store-load failure shows a Chinese message, platform failures don't block saving.
+
+### Issues
+
+#### Issue 1 (High): the line limit is met by cramming, not by decomposition
+**File**: src/components/SetupWizard.tsx (whole file), src/App.tsx:14-16, src/main.tsx:12
+JSX lines run to 300–400 characters; the form is one component. This defeats the "functions < 50 lines / small focused files" rule and is unreadable.
+**Fix**: Split the wizard into section components (e.g. `BasicsSection`, `ScheduleSection`, `RestPolicySection`, `WatchlistSection`, `WishlistSection`, `OptionsSection`) under `src/components/setup/`, plus a pure `formToSettings(form, now)` / `settingsToForm(initial, now)` module with its own unit tests. Then run `pnpm format` (Prettier, already installed) over `src/` and make `pnpm format:check` pass. Keep every function < 50 formatted lines.
+
+#### Issue 2 (High): some validation errors are invisible
+**File**: src/components/SetupWizard.tsx:44-47
+Errors for paths that have no `fieldError` slot (e.g. `wishlist.0.name` empty wish name, `wishlist.0.price`, `lunch.start` bad format, `workStart`) are collected but never rendered, so pressing `开始上班` appears to do nothing.
+**Fix**: Render an error under each wish row and under 上班时间; and show a summary line above the submit button listing any error whose path has no dedicated slot. Add a test: an empty wish name shows `心愿名称不能为空`.
+
+#### Issue 3 (Medium): the wizard has no styling
+**File**: src/App.css
+It renders as raw browser form controls inside a 380 px window. 
+**Fix**: Add `src/styles.css` (imported in `main.tsx`) with the panel-v2 look — system font stack, white card, 12 px radius, 8–12 px spacing, labelled rows, primary button `#1f4e9c`; field errors in `#d63031` 12 px. Remove the scaffold's unused CSS rules.
+
+#### Issue 4 (High, from Task 6 manual test): `tray-badge.png` is a corrupt PNG
+**File**: src-tauri/icons/tray-badge.png
+Decoding fails (`Unknown filter method 214`): its decompressed IDAT is 4324 bytes instead of 32×(32×4+1)=4128 — badge rows were written with extra bytes. Every badge switch errors, so the red dot never shows.
+**Fix**: Regenerate it with a correct writer (each row = 1 filter byte 0 + 128 bytes RGBA). Add a Rust unit test in `tray.rs` (`#[cfg(test)]`) asserting both `icon(TRAY_ICON)` and `icon(TRAY_BADGE_ICON)` decode to 32×32. Run `cargo test --offline --manifest-path src-tauri/Cargo.toml`.
+
+### Verdict: NEEDS_FIX
+
+---
+
+## Code Review Round 10 — 2026-11-05
+
+**Scope**: fixes for Round 9
+**Build Status**: PASS (`pnpm format:check`, `pnpm test` 71/71, `pnpm coverage` 97.2% lines, `pnpm build`, `cargo test --offline` 1/1, `cargo clippy --offline -D warnings`)
+
+All four fixed: wizard split into six section components + pure `form.ts` (with unit tests), every file ≤ 100 lines and Prettier-clean; inline errors for every field plus a fallback summary (empty-wish test added); `src/styles.css` added; `tray-badge.png` regenerated (IDAT now exactly 4128 bytes) with a Rust decode test.
+
+### Notes (Low, carry into Task 8)
+- `SetupWizard` renders a debug footer `本月：… · 本周一：…` that is not in the spec. Remove it.
+- `useMemo(..., [reference])` never memoizes because `reference` is a new `Date` on every render. Drop the memo.
+
+### Verdict: APPROVED

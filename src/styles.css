@@ -1,0 +1,99 @@
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #243447;
+  background: #f4f6f8;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  min-width: 320px;
+}
+button,
+input {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+}
+.container,
+.setup-wizard {
+  width: 100%;
+  max-width: 380px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 24px 20px;
+  background: #fff;
+}
+.setup-wizard h1 {
+  margin: 0 0 20px;
+  font-size: 24px;
+}
+.setup-wizard form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.setup-wizard label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+}
+.setup-wizard fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid #dce2e8;
+  border-radius: 12px;
+}
+.setup-wizard fieldset label {
+  flex-direction: row;
+  align-items: center;
+}
+.setup-wizard input:not([type="checkbox"]):not([type="radio"]) {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #c9d2dc;
+  border-radius: 8px;
+}
+.setup-wizard button {
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: #f8fafc;
+}
+.setup-wizard form > button[type="submit"] {
+  margin-top: 4px;
+  border: 0;
+  color: #fff;
+  background: #1f4e9c;
+}
+.field-error {
+  display: block;
+  color: #d63031;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.watchlist-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.wish-row {
+  display: grid;
+  grid-template-columns: 1fr 90px auto;
+  gap: 6px;
+  align-items: end;
+}
+.setup-month {
+  display: block;
+  margin-top: 12px;
+  color: #7b8794;
+}
