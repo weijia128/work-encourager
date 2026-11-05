@@ -97,3 +97,119 @@ button {
   margin-top: 12px;
   color: #7b8794;
 }
+
+.panel {
+  width: 100%;
+  max-width: 380px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 18px;
+  background: #fff;
+  color: #222;
+  border-radius: 12px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.panel header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.panel header button {
+  border: 0;
+  background: transparent;
+  color: #888;
+  padding: 0;
+}
+.muted {
+  color: #888;
+}
+.date {
+  margin-top: 6px;
+}
+.status-block {
+  margin-top: 8px;
+  color: #1f4e9c;
+  font-size: 20px;
+  font-weight: 700;
+}
+.status-block span {
+  color: #444;
+  font-size: 13px;
+  font-weight: 400;
+}
+.earned-block {
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+}
+.earned-block strong {
+  color: #b5452a;
+  font-size: 30px;
+  letter-spacing: 0.5px;
+}
+.copy-line {
+  margin-top: 6px;
+  padding: 6px 8px;
+  background: #fff8e6;
+  border-radius: 6px;
+}
+.progress-section {
+  margin-top: 10px;
+}
+.progress-section > div:not(.progress-bar) {
+  margin-top: 8px;
+}
+.progress-section span {
+  float: right;
+  color: #888;
+}
+.progress-bar {
+  height: 8px;
+  margin: 4px 0 2px;
+  overflow: hidden;
+  background: #eceff3;
+  border-radius: 4px;
+}
+.progress-bar div {
+  height: 100%;
+  border-radius: 4px;
+}
+.month-prompt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 6px 8px;
+  background: #fff8e6;
+  border-radius: 6px;
+}
+.month-prompt span {
+  flex: 1;
+}
+.month-prompt button {
+  border: 0;
+  color: #1f4e9c;
+  background: transparent;
+  font-size: 12px;
+}
+.panel-slot {
+  min-height: 0;
+}
+.watchlist-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 5px 2px 8px;
+  background: #f3f4f6;
+  border-radius: 10px;
+  font-size: 12px;
+}
+.watchlist-chip button {
+  border: 0;
+  padding: 0 2px;
+  color: #888;
+  background: transparent;
+  font-size: 13px;
+}

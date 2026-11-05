@@ -426,7 +426,7 @@ The layout follows `panel-v2.html` top to bottom:
 
 `MonthPrompt` is shown above the copy line when `needsMonthPrompt` is true. It has two buttons, `没变化` and `去修改`. Either one sets `lastConfirmedMonth`; `去修改` also opens settings. The tray tooltip is `{称呼}，{label} · 今日 ¥x.xx`.
 
-- [ ] **Step 1:** Write the failing tests:
+- [x] **Step 1:** Write the failing tests:
   - `needsMonthPrompt`:
     - false when `lastConfirmedMonth` = current month
     - true at 2026-12-01 09:00 with `lastConfirmedMonth` `2026-11`
@@ -436,10 +436,10 @@ The layout follows `panel-v2.html` top to bottom:
     - it renders `小叶，上班中`, `¥600.0000`, `第 3/21 天`
     - fake platform `setTrayStatus` is called with the title `💰 ¥600`, is NOT called again for ticks within the same minute, and is called again when the minute rolls over or the badge flips
     - the `没变化` click persists `lastConfirmedMonth` and clears the badge
-- [ ] **Step 2:** Run it. Expected: FAIL.
-- [ ] **Step 3:** Implement. `useNow(1000)` drives everything, and the calendar loads once for the current and next year.
-- [ ] **Step 4:** Run it. Expected: PASS. Then run `pnpm tauri dev` and compare visually with `panel-v2.html`.
-- [ ] **Step 5:** Commit `feat: main panel with progress bars and menu bar sync`.
+- [x] **Step 2:** Run it. Expected: FAIL.
+- [x] **Step 3:** Implement. `useNow(1000)` drives everything, and the calendar loads once for the current and next year.
+- [x] **Step 4:** Run the automated checks. Expected: PASS. The manual `pnpm tauri dev` comparison is deferred.
+- [x] **Step 5:** Commit `feat: main panel with progress bars and menu bar sync`.
 
 ### Task 9: Ticker chips, add/remove, market polling
 

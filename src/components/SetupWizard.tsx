@@ -1,19 +1,12 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { useServices } from "../services/ServicesContext";
-import { mondayOf, toDateKey } from "../domain/dates";
 import { BasicsSection } from "./setup/BasicsSection";
 import { ScheduleSection } from "./setup/ScheduleSection";
 import { RestPolicySection } from "./setup/RestPolicySection";
 import { WatchlistSection } from "./setup/WatchlistSection";
 import { WishlistSection } from "./setup/WishlistSection";
 import { OptionsSection } from "./setup/OptionsSection";
-import {
-  formToSettings,
-  monthKey,
-  settingsToForm,
-  validateSettings,
-  type FormState,
-} from "./setup/form";
+import { formToSettings, settingsToForm, validateSettings, type FormState } from "./setup/form";
 import type { Settings } from "../domain/settings";
 
 export function SetupWizard({
@@ -27,7 +20,6 @@ export function SetupWizard({
   const reference = now();
   const [form, setForm] = useState<FormState>(() => settingsToForm(initial, reference));
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const thisMonday = useMemo(() => mondayOf(toDateKey(reference)), [reference]);
   const update = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((old) => ({ ...old, [key]: value }));
   const submit = (event: FormEvent) => {
@@ -71,9 +63,6 @@ export function SetupWizard({
         ))}
         <button type="submit">开始上班</button>
       </form>
-      <small className="setup-month">
-        本月：{monthKey(reference)} · 本周一：{thisMonday}
-      </small>
     </main>
   );
 }

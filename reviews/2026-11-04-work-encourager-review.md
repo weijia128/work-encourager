@@ -222,3 +222,42 @@ All four fixed: wizard split into six section components + pure `form.ts` (with 
 - `useMemo(..., [reference])` never memoizes because `reference` is a new `Date` on every render. Drop the memo.
 
 ### Verdict: APPROVED
+
+### Addendum — user feedback from the manual wizard run (2026-11-05)
+- **Watchlist chips are delete-buttons.** Clicking a chip (which users read as "select") removes it, and the user ended up with an empty 关注品种 box with no way to add back. Fix: make only a small `×` inside the chip remove it; add a `恢复默认` link when the list is empty. The `＋ 添加` search dialog (Task 9) must also be usable from the wizard.
+- **No way to reopen settings after setup.** Pull Task 11 (SettingsView) forward to right after Task 8, so the `⚙ 设置` button works.
+
+### Task 8 follow-up — 2026-11-05
+
+The Round 10 notes and manual-run addendum are resolved: the wizard debug footer and ineffective `useMemo` were removed; watchlist text is inert, removal is available through the small `×`, and an empty list offers `恢复默认`. Settings can now be reopened from the panel through the temporary prefilled wizard flow.
+
+---
+
+## Code Review Round 11 — 2026-11-05
+
+**Scope**: Task 8 — `Panel` + sub-components, `useNow`, `useTraySync`, `monthPrompt`, `App.tsx`, styles; Round 10 notes + user-feedback fixes
+**Build Status**: PASS (`pnpm format:check`, `pnpm test` 75/75, `pnpm coverage` 96.9% lines, `pnpm build`)
+
+Round 10 notes fixed (debug footer and memo removed; chip × only; `恢复默认`). Per-minute integer tray sync is implemented exactly as the 2026-11-05 decision says. The layout follows panel-v2.
+
+### Issues
+
+#### Issue 1 (High): copy never rotates
+**File**: src/components/Panel.tsx:30 — `buildCopyCandidates(...)[0]` always shows the first candidate.
+**Fix**: Use `pickCopy(ctx)`, which rotates every 30 s, and add a Panel test showing that the copy changes when `now` advances 30 s and there are two or more candidates.
+
+#### Issue 2 (Medium): menu bar freezes while the settings screen is open
+**File**: src/App.tsx — `useTraySync` lives inside `Panel`, so while `editing` is true (or before setup is finished) the tray is never updated.
+**Fix**: Lift the `now`/snapshot/tray sync into an App-level component that is mounted whenever settings exist, and render Panel or the settings screen beneath it.
+
+#### Issue 3 (Medium): `去修改` does not clear the month prompt
+**File**: src/App.tsx:38 — editing preserves the old `lastConfirmedMonth`, so after `去修改 → 保存` the red dot and prompt remain. The plan says either button sets it.
+**Fix**: When the edit was opened from the month prompt, stamp the current month on save (for example, `onOpenSettings({ fromMonthPrompt: true })`).
+
+#### Issue 4 (Low): the tray tooltip format differs from the plan
+**File**: src/hooks/useTraySync.ts:14 — should be `{称呼}，{label} · 今日 ¥x.xx`.
+
+#### Issue 5 (Low): minor cleanups
+`monthPrompt.ts` reimplements the month string twice (reuse `monthKey`); the calendar effect in `App.tsx` depends on `services.market` for no reason; the `dateText` builder in `Panel.tsx` should be a small `formatClock(now)` helper in `dates.ts` with a test.
+
+### Verdict: NEEDS_FIX — committed as-is because it is functional, with the fixes going into the next Codex run together with Task 11

@@ -71,4 +71,21 @@ describe("SetupWizard", () => {
     fireEvent.click(screen.getByText("开始上班"));
     expect(screen.getByText("心愿名称不能为空")).toBeTruthy();
   });
+  it("only removes a watchlist item through its x control", () => {
+    renderWizard();
+    fireEvent.click(screen.getByText("沪深300"));
+    expect(screen.getByText("沪深300")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "移除沪深300" }));
+    expect(screen.queryByText("沪深300")).toBeNull();
+  });
+  it("restores the default watchlist when empty", () => {
+    renderWizard();
+    ["沪深300", "科创50", "黄金ETF"].forEach((name) =>
+      fireEvent.click(screen.getByRole("button", { name: `移除${name}` })),
+    );
+    fireEvent.click(screen.getByText("恢复默认"));
+    expect(screen.getByText("沪深300")).toBeTruthy();
+    expect(screen.getByText("科创50")).toBeTruthy();
+    expect(screen.getByText("黄金ETF")).toBeTruthy();
+  });
 });
