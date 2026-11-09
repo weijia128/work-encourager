@@ -104,7 +104,7 @@ function wishLines(ctx: CopyContext): string[] {
     const count = ctx.snapshot.monthEarned / wish.price;
     return count >= 0.1
       ? prefix(ctx.nickname, `本月已经赚出 ${count.toFixed(1)} 个 ${wish.name}`)
-      : prefix(ctx.nickname, `${wish.name}心愿进度 ${(count * 100).toFixed(1)}%`);
+      : prefix(ctx.nickname, `${wish.name}本月心愿进度 ${(count * 100).toFixed(1)}%`);
   });
 }
 

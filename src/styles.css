@@ -89,9 +89,17 @@ button {
 }
 .wish-row {
   display: grid;
-  grid-template-columns: 1fr 90px auto;
+  grid-template-columns: minmax(0, 1fr) minmax(90px, 110px) auto;
   gap: 6px;
   align-items: end;
+}
+.setup-wizard .wish-row label {
+  min-width: 0;
+  flex-direction: column;
+  align-items: stretch;
+}
+.setup-wizard .wish-row input {
+  min-width: 0;
 }
 .setup-month {
   display: block;

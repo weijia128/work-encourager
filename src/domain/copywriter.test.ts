@@ -90,6 +90,19 @@ describe("buildCopyCandidates", () => {
     expect(lines).toContain("小叶，本月已经赚出 2.6 个 新书");
   });
 
+  it("calculates wish progress from month earnings rather than today earnings", () => {
+    const base = contextAt("2026-11-09T15:00:00");
+    const at = (monthEarned: number) =>
+      buildCopyCandidates({
+        ...base,
+        snapshot: { ...base.snapshot, monthEarned },
+        nickname: "小鹏",
+        wishlist: [{ name: "新车", price: 150000 }],
+      });
+    expect(at(300)).toContain("小鹏，新车本月心愿进度 0.2%");
+    expect(at(2700)).toContain("小鹏，新车本月心愿进度 1.8%");
+  });
+
   it("beats only non-stale quotes below month progress", () => {
     const lines = buildCopyCandidates(
       contextAt("2026-11-04T15:00:00", {
