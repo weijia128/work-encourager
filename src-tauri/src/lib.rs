@@ -5,18 +5,19 @@ pub fn run() {
     let single_instance = tauri_plugin_single_instance::init(|app, _args, _cwd| {
         tray::show_window(app);
     });
+    let autostart = {
+        let builder = tauri_plugin_autostart::Builder::new().args(Vec::<String>::new());
+        #[cfg(target_os = "macos")]
+        let builder = builder.macos_launcher(tauri_plugin_autostart::MacosLauncher::LaunchAgent);
+        builder.build()
+    };
     tauri::Builder::default()
         .manage(tray::TrayBadge::default())
         .plugin(single_instance)
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_store::Builder::default().build())
         .plugin(tauri_plugin_http::init())
-        .plugin(
-            tauri_plugin_autostart::Builder::new()
-                .macos_launcher(tauri_plugin_autostart::MacosLauncher::LaunchAgent)
-                .args(Vec::<String>::new())
-                .build(),
-        )
+        .plugin(autostart)
         .invoke_handler(tauri::generate_handler![tray::set_tray_status])
         .setup(|app| {
             #[cfg(target_os = "macos")]
