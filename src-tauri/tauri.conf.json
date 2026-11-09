@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "work-encourager",
+  "productName": "上班鼓励器",
   "version": "0.2.0",
   "identifier": "com.weijia.workencourager",
   "build": {

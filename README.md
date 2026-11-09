@@ -25,13 +25,13 @@
 目前仅支持 **Apple 芯片（M1 及以后）**，Intel Mac 暂不可用。
 
 1. 打开[最新版下载页](https://github.com/weijia128/work-encourager/releases/latest)，下载 `.dmg`
-2. 打开后把「work-encourager」拖进「应用程序」
+2. 打开后把「上班鼓励器」拖进「应用程序」
 3. **第一次打开**：应用没有 Apple 签名，系统会提示"无法验证开发者"
    - 在「应用程序」里**右键** App → 选「打开」→ 再点一次「打开」
    - 还是打不开：「系统设置 → 隐私与安全性」，在下方点「仍要打开」
    - 提示"已损坏"：在终端执行
      ```bash
-     xattr -cr /Applications/work-encourager.app
+     xattr -cr /Applications/上班鼓励器.app
      ```
 
 之后就和普通 App 一样，双击就能打开。

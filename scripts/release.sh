@@ -146,19 +146,22 @@ echo "==> 构建 macOS DMG"
 pnpm tauri build
 
 DMG_DIR="src-tauri/target/release/bundle/dmg"
+BUILT_DMG_PATH="$DMG_DIR/上班鼓励器_${VERSION}_aarch64.dmg"
 DMG_NAME="work-encourager_${VERSION}_aarch64.dmg"
 DMG_PATH="$DMG_DIR/$DMG_NAME"
-if [[ ! -f "$DMG_PATH" ]]; then
-  echo "错误：构建完成但找不到 ${DMG_PATH}。" >&2
+if [[ ! -f "$BUILT_DMG_PATH" ]]; then
+  echo "错误：构建完成但找不到 ${BUILT_DMG_PATH}。" >&2
   exit 1
 fi
+# 应用显示中文名，Release 附件继续使用稳定的 ASCII 文件名。
+mv "$BUILT_DMG_PATH" "$DMG_PATH"
 
 echo "==> 挂载并检查 DMG"
 WORK_DIR="$(mktemp -d "/tmp/work-encourager-release.XXXXXX")"
 MOUNT_DIR="$WORK_DIR/mounted"
 mkdir -p "$MOUNT_DIR"
 hdiutil attach "$DMG_PATH" -nobrowse -readonly -mountpoint "$MOUNT_DIR" >/dev/null
-APP_PATH="$MOUNT_DIR/work-encourager.app"
+APP_PATH="$MOUNT_DIR/上班鼓励器.app"
 if [[ ! -d "$APP_PATH" || ( ! -e "$MOUNT_DIR/Applications" && ! -e "$MOUNT_DIR/应用程序" ) ]]; then
   echo "错误：DMG 中缺少 App 或 Applications/“应用程序”快捷方式。" >&2
   exit 1
@@ -197,7 +200,7 @@ NOTES_PATH="$WORK_DIR/release-notes.md"
 
 1. 在「应用程序」里**右键** App → 选「打开」→ 再点一次「打开」
 2. 还是打不开：「系统设置 → 隐私与安全性」，在下方点「仍要打开」
-3. 提示“已损坏”：在终端执行 \`xattr -cr /Applications/work-encourager.app\`
+3. 提示“已损坏”：在终端执行 \`xattr -cr /Applications/上班鼓励器.app\`
 
 ## 更新内容
 
