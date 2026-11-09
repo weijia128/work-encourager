@@ -105,6 +105,7 @@ WORK_DIR=""
 cleanup() {
   status=$?
   trap - EXIT
+  set +e
   if [[ -n "$WORK_DIR" && -d "$WORK_DIR" ]]; then
     if hdiutil info | grep -Fq "$WORK_DIR/mounted"; then
       hdiutil detach "$WORK_DIR/mounted" >/dev/null 2>&1 || true
@@ -153,13 +154,13 @@ if [[ ! -f "$DMG_PATH" ]]; then
 fi
 
 echo "==> 挂载并检查 DMG"
-WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/work-encourager-release.XXXXXX")"
+WORK_DIR="$(mktemp -d "/tmp/work-encourager-release.XXXXXX")"
 MOUNT_DIR="$WORK_DIR/mounted"
 mkdir -p "$MOUNT_DIR"
 hdiutil attach "$DMG_PATH" -nobrowse -readonly -mountpoint "$MOUNT_DIR" >/dev/null
 APP_PATH="$MOUNT_DIR/work-encourager.app"
-if [[ ! -d "$APP_PATH" || ! -e "$MOUNT_DIR/应用程序" ]]; then
-  echo "错误：DMG 中缺少 App 或“应用程序”快捷方式。" >&2
+if [[ ! -d "$APP_PATH" || ( ! -e "$MOUNT_DIR/Applications" && ! -e "$MOUNT_DIR/应用程序" ) ]]; then
+  echo "错误：DMG 中缺少 App 或 Applications/“应用程序”快捷方式。" >&2
   exit 1
 fi
 APP_VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP_PATH/Contents/Info.plist")"
