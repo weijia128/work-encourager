@@ -87,7 +87,7 @@ export default function TickerChips({
             >
               {item.name}{" "}
               {quoteValue !== undefined
-                ? `${value >= 0 ? "+" : ""}${(value * 100).toFixed(1)}%`
+                ? `${value >= 0 ? "+" : ""}${(value * 100).toFixed(2)}%`
                 : "—"}
               {quote?.stale && <small> 未更新</small>}
               <button
