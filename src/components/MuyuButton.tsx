@@ -6,24 +6,33 @@ function MuyuIcon() {
   return <img src={muyuImage} alt="" aria-hidden="true" draggable={false} />;
 }
 
+let audioContext: AudioContext | null = null;
+
+function scheduleKnock(context: AudioContext) {
+  const now = context.currentTime;
+  const oscillator = context.createOscillator();
+  const gain = context.createGain();
+  oscillator.frequency.value = 180;
+  oscillator.type = "sine";
+  gain.gain.setValueAtTime(0.16, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+  oscillator.connect(gain);
+  gain.connect(context.destination);
+  oscillator.start(now);
+  oscillator.stop(now + 0.15);
+}
+
 function playKnock() {
   const AudioContextClass =
     window.AudioContext ??
     (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
   if (!AudioContextClass) return;
-  const context = new AudioContextClass();
-  const oscillator = context.createOscillator();
-  const gain = context.createGain();
-  oscillator.frequency.value = 180;
-  oscillator.type = "sine";
-  gain.gain.setValueAtTime(0.2, context.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.15);
-  oscillator.connect(gain).connect(context.destination);
-  oscillator.start();
-  oscillator.stop(context.currentTime + 0.15);
-  oscillator.addEventListener("ended", () => {
-    void context.close();
-  });
+  audioContext ??= new AudioContextClass();
+  if (audioContext.state === "suspended") {
+    void audioContext.resume().then(() => scheduleKnock(audioContext!));
+  } else {
+    scheduleKnock(audioContext);
+  }
 }
 
 export default function MuyuButton({
