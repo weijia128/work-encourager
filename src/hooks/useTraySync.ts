@@ -8,16 +8,30 @@ export function useTraySync(
   now: Date,
   tooltip = `上班鼓励器 · 今日 ¥${snapshot.todayEarned.toFixed(2)}`,
   enabled = true,
+  hideAmount = false,
 ): void {
   const { platform } = useServices();
-  const previous = useRef<{ minute: number; badge: boolean } | null>(null);
+  const previous = useRef<{
+    minute: number;
+    badge: boolean;
+    title: string;
+    tooltip: string;
+  } | null>(null);
   const minute = Math.floor(now.getTime() / 60000);
+  const title = hideAmount ? "" : `¥${Math.floor(snapshot.todayEarned)}`;
+  const visibleTooltip = hideAmount ? tooltip.replace(/ · 今日 ¥.*$/, "") : tooltip;
   useEffect(() => {
     if (!enabled) return;
     const old = previous.current;
-    if (old && old.minute === minute && old.badge === badge) return;
-    previous.current = { minute, badge };
-    const title = `¥${Math.floor(snapshot.todayEarned)}`;
-    void platform.setTrayStatus(title, tooltip, badge);
-  }, [badge, enabled, minute, platform, snapshot.todayEarned, tooltip]);
+    if (
+      old &&
+      old.minute === minute &&
+      old.badge === badge &&
+      old.title === title &&
+      old.tooltip === visibleTooltip
+    )
+      return;
+    previous.current = { minute, badge, title, tooltip: visibleTooltip };
+    void platform.setTrayStatus(title, visibleTooltip, badge);
+  }, [badge, enabled, minute, platform, title, visibleTooltip]);
 }

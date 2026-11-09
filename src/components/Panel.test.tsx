@@ -1,11 +1,18 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import Panel from "./Panel";
 import { ServicesProvider } from "../services/ServicesContext";
 import { createFakeMarketProvider, createFakePlatform } from "../test/fakes";
 import { buildCalendar, EMPTY_CALENDAR } from "../domain/holidays";
 import type { Settings } from "../domain/settings";
-import { DEFAULT_WINDOW_HEIGHT, MIN_WINDOW_HEIGHT } from "../domain/windowFit";
+import {
+  COMPACT_WINDOW_HEIGHT,
+  COMPACT_WINDOW_WIDTH,
+  DEFAULT_WINDOW_HEIGHT,
+  MIN_RESIZABLE_WINDOW_HEIGHT,
+  MIN_RESIZABLE_WINDOW_WIDTH,
+  MIN_WINDOW_HEIGHT,
+} from "../domain/windowFit";
 
 const settings: Settings = {
   nickname: "小叶",
@@ -126,6 +133,105 @@ describe("Panel", () => {
     expect(progress).not.toContain(" h");
     expect(progress).toContain("60.0%");
     expect(progress).toContain("第 3/21 天");
+  });
+  it("switches to a floating compact window without exposing hidden income", async () => {
+    const platform = createFakePlatform();
+    const now = new Date(2026, 10, 4, 15);
+    render(
+      <ServicesProvider
+        services={{
+          kv: { get: async () => undefined, set: async () => undefined },
+          market: createFakeMarketProvider(),
+          platform,
+          now: () => now,
+        }}
+      >
+        <Panel
+          settings={{ ...settings, alwaysOnTop: false, hideTodayEarned: true }}
+          calendar={EMPTY_CALENDAR}
+          liveNow={now}
+          onOpenSettings={() => undefined}
+          onSettingsChange={() => undefined}
+        />
+      </ServicesProvider>,
+    );
+
+    await waitFor(() => {
+      const call = platform.calls.filter((entry) => entry.method === "setTrayStatus").slice(-1)[0];
+      expect(call?.args).toEqual(["", "小叶，上班中", false]);
+    });
+    fireEvent.click(screen.getByRole("button", { name: "切换悬浮小窗" }));
+    expect(screen.getByText("¥••••••")).toBeTruthy();
+    await waitFor(() => {
+      expect(
+        platform.calls.some(
+          (call) =>
+            call.method === "setWindowSize" &&
+            call.args[0] === COMPACT_WINDOW_WIDTH &&
+            call.args[1] === COMPACT_WINDOW_HEIGHT,
+        ),
+      ).toBe(true);
+    });
+    expect(
+      platform.calls.some(
+        (call) =>
+          call.method === "setMinSize" &&
+          call.args[0] === COMPACT_WINDOW_WIDTH &&
+          call.args[1] === COMPACT_WINDOW_HEIGHT,
+      ),
+    ).toBe(true);
+    expect(
+      platform.calls.some((call) => call.method === "setResizable" && call.args[0] === false),
+    ).toBe(true);
+    expect(
+      platform.calls.some((call) => call.method === "setAlwaysOnTop" && call.args[0] === true),
+    ).toBe(true);
+    expect(
+      platform.calls.some((call) => call.method === "setShadow" && call.args[0] === false),
+    ).toBe(true);
+
+    fireEvent.click(screen.getByRole("button", { name: "展开主窗口" }));
+    expect(screen.getByText("设置")).toBeTruthy();
+    await waitFor(() => {
+      const call = platform.calls.filter((entry) => entry.method === "setAlwaysOnTop").slice(-1)[0];
+      expect(call?.args).toEqual([false]);
+      const shadow = platform.calls.filter((entry) => entry.method === "setShadow").slice(-1)[0];
+      expect(shadow?.args).toEqual([true]);
+      const minSize = platform.calls.filter((entry) => entry.method === "setMinSize").slice(-1)[0];
+      expect(minSize?.args).toEqual([MIN_RESIZABLE_WINDOW_WIDTH, MIN_RESIZABLE_WINDOW_HEIGHT]);
+      const resizable = platform.calls
+        .filter((entry) => entry.method === "setResizable")
+        .slice(-1)[0];
+      expect(resizable?.args).toEqual([true]);
+    });
+  });
+  it("uses the window controls in the panel header", () => {
+    const platform = createFakePlatform();
+    render(
+      <ServicesProvider
+        services={{
+          kv: { get: async () => undefined, set: async () => undefined },
+          market: createFakeMarketProvider(),
+          platform,
+          now: () => new Date(2026, 10, 4, 15),
+        }}
+      >
+        <Panel
+          settings={settings}
+          calendar={EMPTY_CALENDAR}
+          liveNow={new Date(2026, 10, 4, 15)}
+          syncTray={false}
+          onOpenSettings={() => undefined}
+          onSettingsChange={() => undefined}
+        />
+      </ServicesProvider>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "最小化窗口" }));
+    fireEvent.click(screen.getByRole("button", { name: "切换最大化" }));
+    fireEvent.click(screen.getByRole("button", { name: "关闭窗口" }));
+    expect(platform.calls.map((call) => call.method)).toEqual(
+      expect.arrayContaining(["minimizeWindow", "toggleMaximizeWindow", "closeWindow"]),
+    );
   });
   it("rotates copy after one hour", () => {
     const platform = createFakePlatform();

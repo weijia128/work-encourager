@@ -5,9 +5,10 @@ import { useServices } from "../services/ServicesContext";
 const SCREEN_MARGIN = 24;
 
 /** Resizes the window to the element's height while mounted; restores the default after. */
-export function useFitWindow(ref: RefObject<HTMLElement | null>) {
+export function useFitWindow(ref: RefObject<HTMLElement | null>, enabled = true) {
   const { platform } = useServices();
   useEffect(() => {
+    if (!enabled) return undefined;
     const element = ref.current;
     if (!element) return undefined;
     let last = 0;
@@ -26,5 +27,5 @@ export function useFitWindow(ref: RefObject<HTMLElement | null>) {
       observer?.disconnect();
       platform.setWindowHeight(DEFAULT_WINDOW_HEIGHT).catch(() => undefined);
     };
-  }, [platform, ref]);
+  }, [enabled, platform, ref]);
 }

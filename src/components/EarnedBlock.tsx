@@ -36,9 +36,7 @@ export function EarnedBlock({
       </div>
       <strong>{hidden ? "¥••••••" : `¥${snapshot.todayEarned.toFixed(4)}`}</strong>
       <span className="muted">
-        {hidden
-          ? "收入详情已隐藏"
-          : `速度 ¥${snapshot.perSecond.toFixed(4)} / 秒 · 时薪 ¥${snapshot.hourlyWage.toFixed(2)}`}
+        {hidden ? "收入详情已隐藏" : `时薪 ¥${snapshot.hourlyWage.toFixed(2)}`}
       </span>
     </section>
   );

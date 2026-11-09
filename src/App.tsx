@@ -34,7 +34,7 @@ function LiveApp({
   const snapshot = computeSnapshot(now, settings, calendar);
   const badge = needsMonthPrompt(now, settings, calendar);
   const tooltip = `${settings.nickname}，${snapshot.status === "working" ? "上班中" : snapshot.status === "lunch" ? "午休中" : snapshot.status === "beforeWork" ? "还没上班" : snapshot.status === "afterWork" ? "已下班" : "今天休息"} · 今日 ¥${snapshot.todayEarned.toFixed(2)}`;
-  useTraySync(snapshot, badge, now, tooltip);
+  useTraySync(snapshot, badge, now, tooltip, true, settings.hideTodayEarned);
   if (view === "settings")
     return (
       <SettingsView

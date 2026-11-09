@@ -40,5 +40,12 @@ export function createFakePlatform(): Platform & {
     setAlwaysOnTop: (...args) => record("setAlwaysOnTop", ...args),
     setAutostart: (...args) => record("setAutostart", ...args),
     setWindowHeight: (...args) => record("setWindowHeight", ...args),
+    setWindowSize: (...args) => record("setWindowSize", ...args),
+    setMinSize: (...args) => record("setMinSize", ...args),
+    setResizable: (...args) => record("setResizable", ...args),
+    setShadow: (...args) => record("setShadow", ...args),
+    closeWindow: () => record("closeWindow"),
+    minimizeWindow: () => record("minimizeWindow"),
+    toggleMaximizeWindow: () => record("toggleMaximizeWindow"),
   };
 }

@@ -15,10 +15,14 @@
         "title": "上班鼓励器",
         "titleBarStyle": "Overlay",
         "hiddenTitle": true,
+        "decorations": false,
+        "transparent": true,
         "width": 380,
         "height": 760,
         "label": "main",
-        "resizable": false,
+        "resizable": true,
+        "minWidth": 320,
+        "minHeight": 400,
         "alwaysOnTop": true,
         "backgroundThrottling": "disabled"
       }

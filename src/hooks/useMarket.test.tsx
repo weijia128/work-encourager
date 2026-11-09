@@ -39,7 +39,7 @@ describe("useMarket", () => {
     );
     await waitFor(() => expect(result.current.quotes["1.000300"].change).toBeCloseTo(0.02));
     expect(result.current.quotes["1.000300"].yearChange).toBeCloseTo(0.275);
-    expect(result.current.quotes["1.000300"].halfYearChange).toBeCloseTo(0.275);
+    expect(result.current.quotes["1.000300"].dayChange).toBeCloseTo(0.02);
     expect(fetch).toHaveBeenCalledWith("1.000300");
   });
   it("keeps cached values and marks them stale after a failed refresh", async () => {

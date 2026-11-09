@@ -3,21 +3,21 @@ import type { Quote } from "../domain/market";
 import type { Instrument } from "../domain/settings";
 import { AddInstrumentDialog } from "./AddInstrumentDialog";
 
-type Period = "month" | "halfYear" | "year";
+type Period = "day" | "month" | "year";
 
 const SECTION_TITLE = "反者道之动 · 贪嗔";
 const SECTION_HINT = "反者道之动，弱者道之用 ——《道德经》";
 
 const PERIODS: readonly { key: Period; label: string; title: string }[] = [
+  { key: "day", label: "本日", title: "本日涨跌幅" },
   { key: "month", label: "本月", title: "本月涨跌幅" },
-  { key: "halfYear", label: "半年", title: "近半年涨跌幅" },
   { key: "year", label: "今年", title: "今年涨跌幅" },
 ];
 
 function changeFor(quote: Quote | undefined, period: Period): number | undefined {
   if (!quote) return undefined;
+  if (period === "day") return quote.dayChange;
   if (period === "month") return quote.change;
-  if (period === "halfYear") return quote.halfYearChange;
   return quote.yearChange;
 }
 
@@ -35,7 +35,7 @@ export default function TickerChips({
   onChange: (next: Instrument[]) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const [period, setPeriod] = useState<Period>("month");
+  const [period, setPeriod] = useState<Period>("day");
   const { title: periodTitle } = PERIODS.find((item) => item.key === period) ?? PERIODS[0];
   const remove = (secid: string) => onChange(watchlist.filter((item) => item.secid !== secid));
   const add = (instrument: Instrument) => {

@@ -11,15 +11,20 @@
 - **工作进度**：今日进度和本月进度，按当月实际工作日计算（含法定节假日和调休，支持双休 / 单休 / 大小周）
 - **恒纪元**：距离下一个假期还有几天
 - **鼓励语**：盼头、烟火、清静（《道德经》）三类文案轮换
-- **反者道之动 · 贪嗔**：关注的指数、ETF、股票的本月 / 近半年 / 今年涨跌幅
+- **反者道之动 · 贪嗔**：关注的指数、ETF、股票的本日 / 本月 / 今年涨跌幅
 - **功德木鱼**：敲一下，功德 +1，班味 -1
-- **菜单栏**：显示今日已赚，可开机自启、窗口置顶，金额和时长都可以隐藏
+- **悬浮小窗**：232 × 96 小窗保留今日已赚和木鱼敲击，可拖动、置顶并随时展开
+- **菜单栏**：显示今日已赚，可开机自启、窗口置顶；隐藏收入后，面板、迷你窗、菜单栏和悬浮提示会同步隐藏金额
 
 ## 安装
 
+**[下载最新版](https://github.com/weijia128/work-encourager/releases/latest)** · [查看所有版本](https://github.com/weijia128/work-encourager/releases)
+
 ### macOS
 
-1. 到 [Releases](https://github.com/weijia128/work-encourager/releases) 下载最新的 `.dmg`
+目前仅支持 **Apple 芯片（M1 及以后）**，Intel Mac 暂不可用。
+
+1. 打开[最新版下载页](https://github.com/weijia128/work-encourager/releases/latest)，下载 `.dmg`
 2. 打开后把「work-encourager」拖进「应用程序」
 3. **第一次打开**：应用没有 Apple 签名，系统会提示"无法验证开发者"
    - 在「应用程序」里**右键** App → 选「打开」→ 再点一次「打开」
@@ -52,6 +57,17 @@ pnpm tauri build   # 打包
 ```
 
 远程文案库的配置见 [docs/remote-copy-library.md](docs/remote-copy-library.md)。
+
+## 发布
+
+在 Apple 芯片 Mac 上，一条命令完成版本更新、测试、DMG 检查、SHA256 和 GitHub Release：
+
+```bash
+pnpm release -- --dry-run 0.2.0  # 只检查发布条件
+pnpm release 0.2.0               # 正式发布
+```
+
+详见 [发布说明](docs/releasing.md)。
 
 ## 许可证
 

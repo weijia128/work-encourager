@@ -11,7 +11,7 @@ export interface Quote {
   readonly secid: string;
   readonly change: number;
   readonly yearChange?: number;
-  readonly halfYearChange?: number;
+  readonly dayChange?: number;
   readonly asOf: string;
   readonly stale: boolean;
 }
@@ -38,22 +38,12 @@ export function yearToDateChange(closes: readonly DailyClose[], now: Date): numb
   return latest.close / base.close - 1;
 }
 
-/** Same calendar day six months earlier, clamped to the end of shorter months. */
-function sixMonthsBefore(now: Date): Date {
-  const target = new Date(now.getFullYear(), now.getMonth() - 6, 1);
-  const lastDay = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate();
-  return new Date(target.getFullYear(), target.getMonth(), Math.min(now.getDate(), lastDay));
-}
-
-export function halfYearChange(closes: readonly DailyClose[], now: Date): number | null {
-  const baseDate = toDateKey(sixMonthsBefore(now));
-  const today = toDateKey(now);
-  const beforeBase = closes.filter((bar) => bar.date <= baseDate);
-  const sinceBase = closes.filter((bar) => bar.date > baseDate && bar.date <= today);
-  const base = beforeBase[beforeBase.length - 1];
-  const latest = sinceBase[sinceBase.length - 1];
-  if (!base) return null;
-  if (!latest) return 0;
+/** Latest available session's change from the previous session's close. */
+export function dayChange(closes: readonly DailyClose[], now: Date): number | null {
+  const available = closes.filter((bar) => bar.date <= toDateKey(now));
+  if (available.length < 2) return null;
+  const base = available[available.length - 2];
+  const latest = available[available.length - 1];
   return latest.close / base.close - 1;
 }
 

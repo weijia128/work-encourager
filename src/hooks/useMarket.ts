@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  halfYearChange,
+  dayChange,
   isTradingTime,
   monthToDateChange,
   yearToDateChange,
@@ -34,7 +34,7 @@ function cachedForWatchlist(raw: unknown, watchlist: readonly Instrument[]): Quo
         name: item.name,
         change: quote.change,
         yearChange: finiteOrUndefined(quote.yearChange),
-        halfYearChange: finiteOrUndefined(quote.halfYearChange),
+        dayChange: finiteOrUndefined(quote.dayChange),
         asOf: quote.asOf,
         stale: Boolean(quote.stale),
       };
@@ -71,7 +71,7 @@ export function useMarket(watchlist: readonly Instrument[], cal: HolidayCalendar
                 name: instrument.name,
                 change: monthToDateChange(closes, now()) ?? 0,
                 yearChange: yearToDateChange(closes, now()) ?? undefined,
-                halfYearChange: halfYearChange(closes, now()) ?? undefined,
+                dayChange: dayChange(closes, now()) ?? undefined,
                 asOf: latest.date,
                 stale: false,
               };
