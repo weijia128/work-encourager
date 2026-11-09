@@ -72,7 +72,7 @@ for (let i = 0; i < 3; i += 1) {
 process.exit(1);
 NODE
 then
-  echo "错误：新版本 $VERSION 必须高于当前版本 $CURRENT_VERSION。" >&2
+  echo "错误：新版本 ${VERSION} 必须高于当前版本 ${CURRENT_VERSION}。" >&2
   exit 1
 fi
 
@@ -92,7 +92,7 @@ if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
 fi
 
 if [[ "$DRY_RUN" -eq 1 ]]; then
-  echo "检查通过：可以从 $CURRENT_VERSION 发布 $TAG。"
+  echo "检查通过：可以从 ${CURRENT_VERSION} 发布 ${TAG}。"
   echo " dry-run 未修改文件、未构建、未发布。"
   exit 0
 fi
@@ -148,7 +148,7 @@ DMG_DIR="src-tauri/target/release/bundle/dmg"
 DMG_NAME="work-encourager_${VERSION}_aarch64.dmg"
 DMG_PATH="$DMG_DIR/$DMG_NAME"
 if [[ ! -f "$DMG_PATH" ]]; then
-  echo "错误：构建完成但找不到 $DMG_PATH。" >&2
+  echo "错误：构建完成但找不到 ${DMG_PATH}。" >&2
   exit 1
 fi
 
@@ -164,7 +164,7 @@ if [[ ! -d "$APP_PATH" || ! -e "$MOUNT_DIR/应用程序" ]]; then
 fi
 APP_VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP_PATH/Contents/Info.plist")"
 if [[ "$APP_VERSION" != "$VERSION" ]]; then
-  echo "错误：App 版本为 $APP_VERSION，预期为 $VERSION。" >&2
+  echo "错误：App 版本为 ${APP_VERSION}，预期为 ${VERSION}。" >&2
   exit 1
 fi
 hdiutil detach "$MOUNT_DIR" >/dev/null
